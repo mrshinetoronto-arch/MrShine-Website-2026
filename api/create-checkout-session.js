@@ -30,6 +30,12 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
+  try {
+
+  if (!process.env.STRIPE_SECRET_KEY) {
+    return res.status(500).json({ error: 'Stripe secret key not configured on server' });
+  }
+
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
   const {
@@ -96,4 +102,9 @@ module.exports = async (req, res) => {
   });
 
   res.status(200).json({ url: session.url });
+
+  } catch (err) {
+    console.error('Checkout session error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
 };
