@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MrShine — Booking Calendar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0c;
+      --card: #111115;
+      --elevated: #18181f;
+      --border: rgba(255,255,255,0.07);
+      --red: #cc0000;
+      --chrome: #c0c8d4;
+      --muted: #6b7280;
+      --white: #f0f0f6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+    body { background: var(--bg); color: var(--white); font-family: 'Inter', sans-serif; min-height: 100vh; }
+    h1,h2,h3 { font-family: 'Playfair Display', serif; }
+
+    /* ── Header ── */
+    .admin-hd {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2rem; background: rgba(17,17,21,0.95);
+      border-bottom: 1px solid rgba(204,0,0,0.12);
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(8px);
+    }
+    .admin-hd-left { display: flex; align-items: center; gap: 1.25rem; }
+    .admin-title { font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+    .admin-badge { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.22rem 0.75rem; background: rgba(204,0,0,0.1); border: 1px solid rgba(204,0,0,0.25); border-radius: 100px; font-size: 0.68rem; font-weight: 600; color: rgba(220,80,80,0.9); }
+
+    /* ── Layout ── */
+    .admin-wrap { display: grid; grid-template-columns: 1fr 340px; gap: 0; min-height: calc(100vh - 60px); }
+
+    /* ── Calendar panel ── */
+    .cal-panel { padding: 2rem; border-right: 1px solid var(--border); }
+    .cal-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; }
+    .cal-nav-group { display: flex; align-items: center; gap: 0.75rem; }
+    .cal-nav-btn { width: 36px; height: 36px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--chrome); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; transition: all 0.2s; }
+    .cal-nav-btn:hover { border-color: rgba(204,0,0,0.35); color: var(--red); }
+    .cal-month-label { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; min-width: 220px; text-align: center; }
+    .today-btn { padding: 0.42rem 1rem; border-radius: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--muted); cursor: pointer; font-size: 0.76rem; font-weight: 600; letter-spacing: 0.06em; transition: all 0.2s; font-family: 'Inter', sans-serif; }
+    .today-btn:hover { border-color: var(--red); color: var(--white); }
+
+    /* Day headers */
+    .day-headers { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 4px; }
+    .day-hd { text-align: center; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding: 0.4rem 0; }
+
+    /* Calendar grid */
+    .admin-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .admin-cal-day {
+      min-height: 80px; border-radius: 10px; padding: 0.6rem 0.65rem;
+      background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+      cursor: pointer; transition: all 0.18s; position: relative; overflow: hidden;
+    }
+    .admin-cal-day:hover { border-color: rgba(204,0,0,0.25); background: rgba(255,255,255,0.04); }
+    .admin-cal-day.selected { border-color: var(--red); background: rgba(204,0,0,0.07); }
+    .admin-cal-day.today .day-num { color: var(--red); font-weight: 700; }
+    .admin-cal-day.other-month { opacity: 0.3; cursor: default; }
+    .admin-cal-day.other-month:hover { border-color: var(--border); background: rgba(255,255,255,0.02); }
+    .day-num { font-size: 0.82rem; font-weight: 500; color: var(--chrome); margin-bottom: 0.4rem; }
+    .day-bookings { display: flex; flex-direction: column; gap: 2px; }
+    .booking-pip {
+      font-size: 0.62rem; font-weight: 600; padding: 0.15rem 0.4rem; border-radius: 4px;
+      background: rgba(204,0,0,0.15); border: 1px solid rgba(204,0,0,0.22);
+      color: rgba(220,100,100,0.9); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .booking-count {
+      font-size: 0.6rem; font-weight: 700; color: rgba(204,0,0,0.6); margin-top: 2px;
+      letter-spacing: 0.04em;
+    }
+    .empty-cell { min-height: 80px; border-radius: 10px; }
+
+    /* ── Detail panel ── */
+    .detail-panel { padding: 1.5rem; background: var(--card); overflow-y: auto; }
+    .detail-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--muted); text-align: center; padding: 3rem; }
+    .detail-empty-icon { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.35; }
+    .detail-date-hd { margin-bottom: 1.25rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border); }
+    .detail-date-hd h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.2rem; }
+    .detail-date-hd p { font-size: 0.78rem; color: var(--muted); }
+    .detail-booking {
+      background: var(--elevated); border: 1px solid var(--border); border-radius: 12px;
+      padding: 1.1rem; margin-bottom: 0.75rem;
+      border-left: 3px solid var(--red);
+    }
+    .db-time { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--red); margin-bottom: 0.5rem; }
+    .db-name { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.2rem; }
+    .db-svc { font-size: 0.8rem; color: var(--chrome); margin-bottom: 0.65rem; }
+    .db-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem 1rem; }
+    .db-meta-item { font-size: 0.74rem; }
+    .db-meta-label { color: var(--muted); display: block; margin-bottom: 0.1rem; }
+    .db-meta-val { color: var(--white); font-weight: 500; }
+    .db-total { display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
+    .db-total-label { font-size: 0.74rem; color: var(--muted); }
+    .db-total-val { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 700; color: var(--red); }
+    .db-notes { margin-top: 0.6rem; font-size: 0.74rem; color: var(--muted); background: rgba(255,255,255,0.03); padding: 0.5rem 0.7rem; border-radius: 6px; }
+
+    /* ── Stats bar ── */
+    .stats-bar { display: flex; gap: 1.5rem; margin-bottom: 1.75rem; }
+    .stat-pill { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.9rem; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 100px; }
+    .stat-val { font-size: 0.9rem; font-weight: 700; color: var(--white); }
+    .stat-label { font-size: 0.72rem; color: var(--muted); }
+
+    /* ── No bookings ── */
+    .no-bookings { text-align: center; padding: 2rem; color: var(--muted); font-size: 0.85rem; }
+
+    /* ── Clear button ── */
+    .clear-btn { font-size: 0.7rem; color: rgba(107,114,128,0.45); background: none; border: none; cursor: pointer; padding: 0.25rem 0.5rem; border-radius: 4px; transition: color 0.2s; }
+    .clear-btn:hover { color: rgba(204,0,0,0.6); }
+
+    @media (max-width: 900px) {
+      .admin-wrap { grid-template-columns: 1fr; }
+      .detail-panel { border-top: 1px solid var(--border); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="admin-hd">
+  <div class="admin-hd-left">
+    <div class="admin-title">MrShine Admin</div>
+    <div class="admin-badge">📅 Booking Calendar</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:1rem;">
+    <span id="totalCount" style="font-size:0.78rem;color:var(--muted);"></span>
+    <button class="clear-btn" onclick="clearAllBookings()">Clear all data</button>
+    <a href="index.html" style="font-size:0.76rem;color:var(--muted);text-decoration:none;padding:0.4rem 0.9rem;border:1px solid var(--border);border-radius:6px;transition:color 0.2s;" onmouseover="this.style.color='#f0f0f6'" onmouseout="this.style.color='var(--muted)'">← Site</a>
+  </div>
+</div>
+
+<div class="admin-wrap">
+
+  <!-- Calendar Panel -->
+  <div class="cal-panel">
+    <div class="cal-top">
+      <div class="cal-nav-group">
+        <button class="cal-nav-btn" onclick="shiftMonth(-1)">&#8592;</button>
+        <div class="cal-month-label" id="calLabel"></div>
+        <button class="cal-nav-btn" onclick="shiftMonth(1)">&#8594;</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.75rem;">
+        <div class="stats-bar" id="statsBar"></div>
+        <button class="today-btn" onclick="goToday()">Today</button>
+      </div>
+    </div>
+
+    <div class="day-headers" id="dayHeaders"></div>
+    <div class="admin-cal-grid" id="adminCalGrid"></div>
+  </div>
+
+  <!-- Detail Panel -->
+  <div class="detail-panel" id="detailPanel">
+    <div class="detail-empty">
+      <div class="detail-empty-icon">📋</div>
+      <p style="font-weight:600;margin-bottom:0.4rem;">Select a day</p>
+      <p style="font-size:0.8rem;">Click any day on the calendar to view bookings.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS_FULL = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const DAYS_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+let state = { year: 0, month: 0, selectedDate: null };
+
+function getBookings() {
+  return JSON.parse(localStorage.getItem('mrshine_bookings') || '[]');
+}
+
+function init() {
+  const now = new Date();
+  state.year  = now.getFullYear();
+  state.month = now.getMonth();
+  renderDayHeaders();
+  renderCalendar();
+  updateStats();
+}
+
+function renderDayHeaders() {
+  document.getElementById('dayHeaders').innerHTML =
+    DAYS_SHORT.map(d => `<div class="day-hd">${d}</div>`).join('');
+}
+
+function updateStats() {
+  const bookings = getBookings();
+  const monthBookings = bookings.filter(b => {
+    const d = new Date(b.date);
+    return d.getFullYear() === state.year && d.getMonth() === state.month;
+  });
+  const monthRevenue = monthBookings.reduce((s, b) => s + (b.total || 0), 0);
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat-pill"><span class="stat-val">${monthBookings.length}</span><span class="stat-label">this month</span></div>
+    <div class="stat-pill"><span class="stat-val">$${monthRevenue.toFixed(0)}</span><span class="stat-label">revenue</span></div>
+  `;
+  document.getElementById('totalCount').textContent = `${bookings.length} total booking${bookings.length !== 1 ? 's' : ''}`;
+}
+
+function renderCalendar() {
+  const y = state.year, m = state.month;
+  document.getElementById('calLabel').textContent = `${MONTHS[m]} ${y}`;
+
+  const bookings   = getBookings();
+  const today      = new Date(); today.setHours(0,0,0,0);
+  const firstDay   = new Date(y, m, 1).getDay();
+  const lastDay    = new Date(y, m + 1, 0).getDate();
+  const prevLast   = new Date(y, m, 0).getDate();
+
+  // Group bookings by date string
+  const byDate = {};
+  bookings.forEach(b => {
+    const d = new Date(b.date);
+    const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    if (!byDate[key]) byDate[key] = [];
+    byDate[key].push(b);
+  });
+
+  let html = '';
+
+  // Prev month trailing days
+  for (let i = firstDay - 1; i >= 0; i--) {
+    const d = prevLast - i;
+    html += `<div class="admin-cal-day other-month"><div class="day-num">${d}</div></div>`;
+  }
+
+  // Current month days
+  for (let d = 1; d <= lastDay; d++) {
+    const dt  = new Date(y, m, d);
+    const key = `${y}-${m}-${d}`;
+    const bks = byDate[key] || [];
+    const isToday  = dt.getTime() === today.getTime();
+    const isSel    = state.selectedDate &&
+      state.selectedDate.getFullYear() === y &&
+      state.selectedDate.getMonth()    === m &&
+      state.selectedDate.getDate()     === d;
+
+    let pips = '';
+    if (bks.length > 0) {
+      const show = bks.slice(0, 2);
+      pips = show.map(b => `<div class="booking-pip">${b.time} · ${b.fname}</div>`).join('');
+      if (bks.length > 2) pips += `<div class="booking-count">+${bks.length - 2} more</div>`;
+    }
+
+    html += `
+      <div class="admin-cal-day${isToday ? ' today' : ''}${isSel ? ' selected' : ''}"
+           onclick="selectDay(new Date(${y},${m},${d}))">
+        <div class="day-num">${d}</div>
+        <div class="day-bookings">${pips}</div>
+      </div>`;
+  }
+
+  // Next month fill
+  const totalCells = firstDay + lastDay;
+  const remaining  = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+  for (let d = 1; d <= remaining; d++) {
+    html += `<div class="admin-cal-day other-month"><div class="day-num">${d}</div></div>`;
+  }
+
+  document.getElementById('adminCalGrid').innerHTML = html;
+}
+
+function selectDay(dt) {
+  state.selectedDate = dt;
+  renderCalendar();
+  renderDetail(dt);
+}
+
+function renderDetail(dt) {
+  const bookings = getBookings();
+  const dayBookings = bookings
+    .filter(b => {
+      const d = new Date(b.date);
+      return d.getFullYear() === dt.getFullYear() &&
+             d.getMonth()    === dt.getMonth() &&
+             d.getDate()     === dt.getDate();
+    })
+    .sort((a, b) => {
+      // Sort by time
+      const tA = parseTime(a.time), tB = parseTime(b.time);
+      return tA - tB;
+    });
+
+  const dateStr = dt.toLocaleDateString('en-CA', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  const panel   = document.getElementById('detailPanel');
+
+  if (dayBookings.length === 0) {
+    panel.innerHTML = `
+      <div class="detail-date-hd">
+        <h3>${dt.toLocaleDateString('en-CA', { weekday: 'long', day: 'numeric', month: 'long' })}</h3>
+        <p>${dt.getFullYear()}</p>
+      </div>
+      <div class="no-bookings">No bookings on this day.</div>`;
+    return;
+  }
+
+  const dayRevenue = dayBookings.reduce((s, b) => s + (b.total || 0), 0);
+
+  let html = `
+    <div class="detail-date-hd">
+      <h3>${dt.toLocaleDateString('en-CA', { weekday: 'long', day: 'numeric', month: 'long' })}</h3>
+      <p style="color:var(--muted);font-size:0.78rem;">${dayBookings.length} booking${dayBookings.length !== 1 ? 's' : ''} · $${dayRevenue.toFixed(2)} revenue</p>
+    </div>`;
+
+  dayBookings.forEach(b => {
+    const addonNames = (b.addons || []).map(id => {
+      const names = { 'engine-bay':'Engine Bay','headlight':'Headlights','wax-buff':'Wax & Buff','undercarriage':'Undercarriage','seat-restore':'Seats','liquid-wax':'Liquid Wax','odour':'Odour' };
+      return names[id] || id;
+    });
+    const loc = (b.location || '').replace(' — ', '\n');
+    html += `
+      <div class="detail-booking">
+        <div class="db-time">${b.time || '—'}</div>
+        <div class="db-name">${b.fname || ''} ${b.lname || ''}</div>
+        <div class="db-svc">${b.svcLabel || b.svcName || '—'}</div>
+        <div class="db-meta">
+          <div class="db-meta-item"><span class="db-meta-label">Vehicle</span><span class="db-meta-val">${b.vehicle || '—'}</span></div>
+          <div class="db-meta-item"><span class="db-meta-label">Size</span><span class="db-meta-val">${({ sedan:'Sedan', suv:'Compact SUV', large:'Large' }[b.sz]) || b.sz}</span></div>
+          <div class="db-meta-item"><span class="db-meta-label">Phone</span><span class="db-meta-val">${b.phone || '—'}</span></div>
+          <div class="db-meta-item"><span class="db-meta-label">Email</span><span class="db-meta-val" style="font-size:0.68rem;">${b.email || '—'}</span></div>
+          <div class="db-meta-item" style="grid-column:1/-1;"><span class="db-meta-label">Location</span><span class="db-meta-val">${b.location || '—'}</span></div>
+          ${addonNames.length ? `<div class="db-meta-item" style="grid-column:1/-1;"><span class="db-meta-label">Add-ons</span><span class="db-meta-val">${addonNames.join(', ')}</span></div>` : ''}
+        </div>
+        ${b.notes ? `<div class="db-notes">📝 ${b.notes}</div>` : ''}
+        <div class="db-total">
+          <span class="db-total-label">Total Paid</span>
+          <span class="db-total-val">$${(b.total || 0).toFixed(2)}</span>
+        </div>
+      </div>`;
+  });
+
+  panel.innerHTML = html;
+}
+
+function parseTime(t) {
+  if (!t) return 0;
+  const [time, ampm] = t.split(' ');
+  let [h, m] = time.split(':').map(Number);
+  if (ampm === 'PM' && h !== 12) h += 12;
+  if (ampm === 'AM' && h === 12) h = 0;
+  return h * 60 + m;
+}
+
+function shiftMonth(delta) {
+  state.month += delta;
+  if (state.month > 11) { state.month = 0; state.year++; }
+  if (state.month < 0)  { state.month = 11; state.year--; }
+  state.selectedDate = null;
+  document.getElementById('detailPanel').innerHTML = `
+    <div class="detail-empty">
+      <div class="detail-empty-icon">📋</div>
+      <p style="font-weight:600;margin-bottom:0.4rem;">Select a day</p>
+      <p style="font-size:0.8rem;">Click any day to view bookings.</p>
+    </div>`;
+  renderCalendar();
+  updateStats();
+}
+
+function goToday() {
+  const now   = new Date();
+  state.year  = now.getFullYear();
+  state.month = now.getMonth();
+  renderCalendar();
+  updateStats();
+  selectDay(new Date(now.getFullYear(), now.getMonth(), now.getDate()));
+}
+
+function clearAllBookings() {
+  if (!confirm('Delete all booking data? This cannot be undone.')) return;
+  localStorage.removeItem('mrshine_bookings');
+  state.selectedDate = null;
+  renderCalendar();
+  updateStats();
+  document.getElementById('detailPanel').innerHTML = `
+    <div class="detail-empty">
+      <div class="detail-empty-icon">📋</div>
+      <p style="font-weight:600;margin-bottom:0.4rem;">No bookings</p>
+      <p style="font-size:0.8rem;">All booking data has been cleared.</p>
+    </div>`;
+}
+
+init();
+</script>
+</body>
+</html>

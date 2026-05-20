@@ -1,0 +1,1631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book a Detail — MrShine Car Wash &amp; Detailing Toronto</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- EmailJS — see EMAILJS_CONFIG in the script to set up email confirmations -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <style>
+    :root {
+      --bg:         #090909;
+      --card:       #111113;
+      --elevated:   #191920;
+      --border:     rgba(192,200,212,0.07);
+      --red:        #cc0000;
+      --red-hi:     #e00000;
+      --chrome:     #c0c8d4;
+      --chrome-hi:  #dce4ee;
+      --muted:      #6b7280;
+      --white:      #f0f0f6;
+      --shadow-red: 0 0 36px rgba(204,0,0,0.42), 0 8px 22px rgba(0,0,0,0.6);
+    }
+    * { -webkit-font-smoothing: antialiased; box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--white); font-family: 'Inter', system-ui, sans-serif; line-height: 1.65; overflow-x: hidden; }
+    h1, h2, h3 { font-family: 'Playfair Display', Georgia, serif; line-height: 1.08; }
+    a { text-decoration: none; color: inherit; }
+    .container { max-width: 1160px; margin: 0 auto; padding: 0 2rem; }
+    input, select, textarea, button { font-family: inherit; }
+
+    /* ── Noise ── */
+    .noise { position: absolute; inset: 0; pointer-events: none; z-index: 1; opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 250px; }
+
+    /* ── Chrome text ── */
+    .chrome-text { background: linear-gradient(180deg, var(--chrome-hi) 0%, var(--chrome) 50%, #8a94a0 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+    /* ── Eyebrow ── */
+    .eyebrow { display: inline-block; font-family: 'Inter', sans-serif; font-size: 0.67rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--red); margin-bottom: 0.85rem; }
+
+    /* ──────────────────
+       BUTTONS
+    ────────────────── */
+    .btn { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.75rem 1.7rem; border-radius: 5px; font-family: 'Inter', sans-serif; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; border: none; transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.22s, background 0.22s; }
+    .btn:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+    .btn:active { transform: scale(0.97) !important; }
+    .btn-primary { background: var(--red); color: #fff; box-shadow: var(--shadow-red); }
+    .btn-primary:hover { background: var(--red-hi); box-shadow: 0 0 50px rgba(204,0,0,0.6), 0 12px 32px rgba(0,0,0,0.65); transform: translateY(-2px); }
+    .btn-primary:disabled, .btn:disabled { opacity: 0.35; cursor: not-allowed; box-shadow: none; transform: none !important; }
+    .btn-ghost { background: transparent; color: var(--chrome); border: 1.5px solid rgba(192,200,212,0.22); }
+    .btn-ghost:hover { border-color: rgba(192,200,212,0.55); color: var(--white); transform: translateY(-2px); }
+    .btn-book { background: var(--red); color: #fff; border: none; padding: 0.7rem 1.4rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; cursor: pointer; box-shadow: 0 0 20px rgba(204,0,0,0.3); transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s, background 0.2s; }
+    .btn-book:hover { background: var(--red-hi); transform: translateY(-2px); box-shadow: 0 0 36px rgba(204,0,0,0.55); }
+    .btn-book:active { transform: scale(0.97); }
+    .btn-book:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+    .btn-full { width: 100%; justify-content: center; padding: 1rem 2rem; font-size: 0.85rem; }
+
+    /* ──────────────────
+       NAV
+    ────────────────── */
+    #nav { position: fixed; top: 0; left: 0; right: 0; z-index: 500; display: flex; align-items: center; justify-content: space-between; padding: 0.55rem 2.5rem; background: rgba(9,9,9,0.95); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-bottom: 1px solid rgba(204,0,0,0.12); }
+    #nav .brand-logo { height: 52px; width: auto; mix-blend-mode: screen; display: block; }
+    .nav-right { display: flex; align-items: center; gap: 1.5rem; }
+    .nav-phone { font-size: 0.8rem; font-weight: 500; color: var(--muted); letter-spacing: 0.04em; transition: color 0.2s; }
+    .nav-phone:hover { color: var(--white); }
+
+    /* ──────────────────
+       HERO
+    ────────────────── */
+    #hero { min-height: 100vh; display: flex; align-items: center; padding: 8rem 0 5rem; position: relative; overflow: hidden; }
+    .hero-bg { position: absolute; inset: 0; z-index: 0; background: radial-gradient(ellipse 70% 60% at 100% 55%, rgba(204,0,0,0.15) 0%, transparent 58%), radial-gradient(ellipse 45% 65% at 0% 20%, rgba(100,8,8,0.1) 0%, transparent 55%), radial-gradient(ellipse 100% 50% at 50% 110%, rgba(9,9,9,1) 0%, transparent 60%); }
+    .hero-bottom-line { position: absolute; bottom: 0; left: 0; right: 0; height: 1px; z-index: 3; background: linear-gradient(to right, transparent 5%, rgba(204,0,0,0.5) 40%, rgba(204,0,0,0.5) 60%, transparent 95%); }
+    .hero-inner { position: relative; z-index: 2; text-align: center; max-width: 820px; margin: 0 auto; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.38rem 1.1rem; border-radius: 100px; margin-bottom: 2rem; background: rgba(204,0,0,0.1); border: 1px solid rgba(204,0,0,0.3); font-size: 0.74rem; font-weight: 500; color: rgba(225,60,60,0.92); }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); animation: bdot 2.2s ease-in-out infinite; }
+    @keyframes bdot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.35;transform:scale(0.55)} }
+    #hero h1 { font-size: clamp(3.2rem, 6.5vw, 6rem); font-weight: 800; letter-spacing: -0.04em; margin-bottom: 1.2rem; line-height: 1.0; }
+    #hero h1 em { font-style: italic; color: var(--red); -webkit-text-fill-color: var(--red); }
+    .hero-sub { color: var(--muted); font-size: 1.08rem; line-height: 1.78; margin-bottom: 2.75rem; max-width: 520px; margin-left: auto; margin-right: auto; }
+    .hero-cta { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .hero-cta .btn-primary { font-size: 0.92rem; padding: 1rem 2.4rem; }
+    .hero-trust { margin-top: 3.5rem; display: flex; justify-content: center; gap: 2.5rem; flex-wrap: wrap; }
+    .ht-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.78rem; color: var(--muted); }
+    .ht-item strong { color: var(--chrome); font-weight: 600; }
+    .ht-dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(204,0,0,0.4); }
+
+    /* ──────────────────
+       SERVICES PAGE SECTION
+    ────────────────── */
+    #services { padding: 8rem 0 0; background: #f5f2ee; color: #0b0b0d; }
+    .sec-head { margin-bottom: 3.5rem; }
+    .sec-head.center { text-align: center; }
+    .sec-head h2 { font-size: clamp(2rem,3.8vw,3rem); font-weight: 700; letter-spacing: -0.03em; margin-bottom: 0.7rem; }
+    .sec-head p { color: #5a5550; font-size: 0.975rem; max-width: 480px; line-height: 1.75; }
+    .sec-head.center p { margin: 0 auto; }
+    #services .eyebrow { color: var(--red); }
+
+    /* Detailing cards (main page) */
+    .det-cards-page { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; margin-bottom: 0; }
+    .det-card-page { background: #fff; border: 1px solid rgba(11,11,13,0.08); border-radius: 18px; padding: 2rem 1.85rem; display: flex; flex-direction: column; box-shadow: 0 2px 16px rgba(11,11,13,0.07); transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.28s, border-color 0.28s; position: relative; overflow: hidden; }
+    .det-card-page::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--red), transparent); opacity: 0; transition: opacity 0.28s; }
+    .det-card-page:hover { transform: translateY(-5px); box-shadow: 0 20px 56px rgba(204,0,0,0.09), 0 4px 16px rgba(11,11,13,0.08); border-color: rgba(204,0,0,0.2); }
+    .det-card-page:hover::after { opacity: 1; }
+    .dcp-icon { font-size: 2rem; margin-bottom: 0.85rem; display: block; }
+    .dcp-header { margin-bottom: 0.35rem; }
+    .dcp-name { font-family: 'Inter', sans-serif; font-size: 1.15rem; font-weight: 700; color: #0b0b0d; }
+    .dcp-meta { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.9rem; }
+    .dcp-price { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: var(--red); }
+    .dcp-dur { font-size: 0.75rem; color: #888; font-weight: 500; }
+    .dcp-size-note { font-size: 0.7rem; color: #999; margin-bottom: 1rem; }
+    .dcp-size-note span { color: rgba(180,25,25,0.8); font-weight: 600; }
+    .dcp-divider { height: 1px; background: rgba(11,11,13,0.08); margin: 1rem 0; }
+
+    /* Checklist (services page — dark text) */
+    .svc-checklist { list-style: none; margin: 0 0 1rem; max-height: 180px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(204,0,0,0.25) transparent; }
+    .svc-checklist::-webkit-scrollbar { width: 3px; }
+    .svc-checklist::-webkit-scrollbar-thumb { background: rgba(204,0,0,0.25); border-radius: 2px; }
+    .svc-checklist li { display: flex; align-items: flex-start; gap: 0.55rem; font-size: 0.8rem; color: #2a2a2a; line-height: 1.4; padding: 0.18rem 0; }
+    .svc-checklist li::before { content: '✓'; color: var(--red); font-weight: 700; font-size: 0.8rem; flex-shrink: 0; margin-top: 0.05rem; }
+
+    /* Popular badge (services page) */
+    .pop-tag { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.18rem 0.65rem; border-radius: 100px; background: rgba(204,0,0,0.08); border: 1px solid rgba(204,0,0,0.22); font-size: 0.64rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(180,25,25,0.9); margin-bottom: 0.85rem; }
+
+    /* Add-ons page section */
+    .addons-page-section { background: #1a1015; padding: 5rem 0 6rem; }
+    .addons-page-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    .addon-page-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.35rem 1.2rem; transition: border-color 0.22s, transform 0.22s cubic-bezier(0.34,1.56,0.64,1); }
+    .addon-page-card:hover { border-color: rgba(204,0,0,0.28); transform: translateY(-3px); }
+    .apc-icon { font-size: 1.5rem; margin-bottom: 0.65rem; display: block; }
+    .apc-name { font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--white); }
+    .apc-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.6; margin-bottom: 0.75rem; }
+    .apc-price { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: var(--red); }
+    .apc-price.quote { font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 500; color: var(--muted); }
+
+    /* ──────────────────
+       BOOKING CTA SECTION
+    ────────────────── */
+    #booking { padding: 6rem 0 7rem; position: relative; background: linear-gradient(180deg, #0b0b0d 0%, #090909 50%, #0a0708 100%); overflow: hidden; }
+    #booking::before { content: ''; position: absolute; top: -80px; left: 50%; transform: translateX(-50%); width: 800px; height: 400px; pointer-events: none; background: radial-gradient(ellipse, rgba(204,0,0,0.07) 0%, transparent 62%); }
+
+    /* ──────────────────
+       FULL-SCREEN BOOKING OVERLAY
+    ────────────────── */
+    #bkOverlay {
+      position: fixed; inset: 0; z-index: 9999;
+      display: none; flex-direction: column;
+      background: var(--bg); overflow: hidden;
+    }
+    #bkOverlay.open { display: flex; }
+
+    .bko-hd {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.75rem 2rem; border-bottom: 1px solid rgba(204,0,0,0.12);
+      flex-shrink: 0; background: rgba(9,9,9,0.98);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    }
+    .bko-logo { height: 40px; mix-blend-mode: screen; display: block; }
+    .bko-prog {
+      display: flex; align-items: center;
+      flex: 1; max-width: 500px; margin: 0 2rem;
+    }
+    .bko-close {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      color: var(--muted); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.2s, color 0.2s; flex-shrink: 0;
+    }
+    .bko-close:hover { border-color: rgba(204,0,0,0.4); color: var(--red); }
+
+    .bko-body { flex: 1; overflow: hidden; position: relative; }
+
+    /* Progress (shared between overlay and used standalone) */
+    .booking-progress { display: flex; align-items: center; }
+    .prog-step { display: flex; align-items: center; gap: 0.55rem; flex: 1; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); transition: color 0.3s; }
+    .prog-step.active { color: var(--white); }
+    .prog-step.done   { color: var(--red); }
+    .prog-num { width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.1); transition: all 0.3s; }
+    .prog-step.active .prog-num { background: var(--red); border-color: var(--red); color: #fff; box-shadow: 0 0 12px rgba(204,0,0,0.5); }
+    .prog-step.done   .prog-num { background: rgba(204,0,0,0.15); border-color: var(--red); color: var(--red); }
+    .prog-step.done   .prog-num > span { display: none; }
+    .prog-step.done   .prog-num::after { content: '✓'; font-size: 0.65rem; }
+    .prog-connector { flex: 0 0 1.2rem; height: 1px; background: rgba(255,255,255,0.08); }
+    .prog-connector.lit { background: rgba(204,0,0,0.45); }
+    .prog-label { display: none; }
+    @media (min-width: 580px) { .prog-label { display: block; } }
+
+    /* Step panels — full-screen layout */
+    .step-panel { position: absolute; inset: 0; display: none; flex-direction: column; }
+    .step-panel.active { display: flex; animation: stepIn 0.3s cubic-bezier(0.22,1,0.36,1) both; }
+    @keyframes stepIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    .sp-inner { display: flex; flex-direction: column; height: 100%; max-width: 860px; margin: 0 auto; width: 100%; padding: 0 2rem; }
+    .sp-head { padding: 1.5rem 0 1rem; flex-shrink: 0; }
+    .step-title { font-size: 1.65rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 0.35rem; }
+    .step-sub { color: var(--muted); font-size: 0.875rem; line-height: 1.6; }
+    .sp-content { flex: 1; overflow-y: auto; padding-bottom: 0.5rem; }
+    .sp-content::-webkit-scrollbar { width: 6px; }
+    .sp-content::-webkit-scrollbar-track { background: rgba(255,255,255,0.04); border-radius: 3px; }
+    .sp-content::-webkit-scrollbar-thumb { background: rgba(204,0,0,0.6); border-radius: 3px; }
+    .sp-content::-webkit-scrollbar-thumb:hover { background: rgba(204,0,0,0.85); }
+    .scroll-fade-hint { position: sticky; bottom: 0; height: 72px; background: linear-gradient(transparent, var(--bg) 85%); margin-top: -72px; pointer-events: none; z-index: 5; }
+    .sp-footer { flex-shrink: 0; padding: 1rem 0 1.5rem; border-top: 1px solid rgba(255,255,255,0.06); }
+
+    /* Add-ons grid in overlay — 2 columns */
+    #bkOverlay .addons-bk-grid { grid-template-columns: repeat(2, 1fr); }
+
+    /* ── Section dividers inside booking ── */
+    .bk-section-hd { display: flex; align-items: center; gap: 1.1rem; margin-bottom: 1rem; margin-top: 1.25rem; }
+    .bk-section-label { font-family: 'Inter', sans-serif; font-size: 0.67rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--chrome); white-space: nowrap; }
+    .bk-section-line { flex: 1; height: 1px; background: rgba(192,200,212,0.12); }
+
+    /* ── Detailing service cards (booking form) ── */
+    .det-grid-bk { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
+    .det-card-bk.det-card-premium { grid-column: 1 / -1; flex-direction: row; align-items: center; gap: 0; padding: 1.1rem 1.5rem; border-color: rgba(160,120,32,0.28); background: linear-gradient(105deg, rgba(160,120,32,0.07) 0%, rgba(255,255,255,0.02) 60%); overflow: visible; }
+    .det-card-bk.det-card-premium:hover { border-color: rgba(160,120,32,0.55); }
+    .det-card-bk.det-card-premium::before { background: linear-gradient(90deg, #a07820, transparent); border-radius: 13px 13px 0 0; }
+    .det-card-bk.det-card-premium.selected { border-color: #a07820; background: rgba(160,120,32,0.12); }
+    .det-card-bk.det-card-premium .dcb-icon { font-size: 2rem; margin-bottom: 0; flex-shrink: 0; margin-right: 1rem; }
+    .det-card-bk.det-card-premium .dcb-left { display: flex; flex-direction: column; flex-shrink: 0; width: 185px; padding-right: 1.25rem; }
+    .det-card-bk.det-card-premium .dcb-divider { width: 1px; height: auto; align-self: stretch; background: rgba(255,255,255,0.08); margin: 0 1.25rem 0 0; flex-shrink: 0; }
+    .det-card-bk.det-card-premium .dcb-name { font-size: 1rem; }
+    .det-card-bk.det-card-premium .dcb-meta { margin-bottom: 0.25rem; }
+    .det-card-bk.det-card-premium .bk-checklist { display: grid; grid-template-columns: 1fr 1fr; column-gap: 2rem; row-gap: 0; align-items: start; align-content: start; flex: 1; margin: 0; }
+    .det-card-bk.det-card-premium .bk-checklist li { align-self: start; padding: 0.22rem 0; }
+    .det-card-bk.det-card-premium .dcb-check { margin-left: 1rem; flex-shrink: 0; align-self: center; }
+    .det-card-bk { background: rgba(255,255,255,0.03); border: 1.5px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 1.35rem 1.25rem; cursor: pointer; position: relative; transition: all 0.22s cubic-bezier(0.34,1.56,0.64,1); overflow: hidden; display: flex; flex-direction: column; }
+    .det-card-bk::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--red), transparent); opacity: 0; transition: opacity 0.22s; }
+    .det-card-bk:hover { border-color: rgba(204,0,0,0.32); transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,0,0,0.35); }
+    .det-card-bk:hover::before { opacity: 0.7; }
+    .det-card-bk.selected { border-color: var(--red); background: rgba(204,0,0,0.08); }
+    .det-card-bk.selected::before { opacity: 1; }
+    .dcb-check { width: 22px; height: 22px; border-radius: 50%; background: var(--red); display: none; align-items: center; justify-content: center; box-shadow: 0 0 8px rgba(204,0,0,0.5); flex-shrink: 0; }
+    .det-card-bk.selected .dcb-check { display: flex; }
+    .dcb-check svg { width: 10px; height: 10px; stroke: #fff; stroke-width: 2.5; fill: none; }
+    .det-card-bk.selected .dcb-pop { display: none; }
+    .dcb-pop { position: absolute; top: 0.75rem; right: 0.75rem; padding: 0.15rem 0.55rem; border-radius: 100px; background: rgba(204,0,0,0.12); border: 1px solid rgba(204,0,0,0.28); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(220,60,60,0.9); }
+    .dcb-icon { font-size: 1.5rem; margin-bottom: 0.55rem; display: block; }
+    .dcb-name { font-family: 'Inter', sans-serif; font-size: 0.92rem; font-weight: 700; margin-bottom: 0.2rem; }
+    .dcb-meta { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem; }
+    .dcb-price { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--red); }
+    .dcb-dur { font-size: 0.7rem; color: var(--muted); }
+    .dcb-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 0.65rem 0; }
+
+    /* Checklist (booking form — light text) */
+    .bk-checklist { list-style: none; flex: 1; }
+    .bk-checklist li { display: flex; align-items: flex-start; gap: 0.55rem; font-size: 0.875rem; color: var(--chrome); line-height: 1.45; padding: 0.28rem 0; }
+    .bk-checklist li::before { content: '✓'; color: var(--red); font-weight: 700; font-size: 0.8rem; flex-shrink: 0; margin-top: 0.12rem; }
+
+    /* ── Vehicle tabs ── */
+    .veh-tabs { display: flex; gap: 0.65rem; margin-bottom: 1.25rem; }
+    .veh-tab { flex: 1; padding: 0.75rem 0.5rem; border-radius: 10px; cursor: pointer; text-align: center; background: rgba(255,255,255,0.03); border: 1.5px solid rgba(255,255,255,0.08); transition: all 0.22s; }
+    .veh-tab:hover { border-color: rgba(204,0,0,0.28); }
+    .veh-tab.active { border-color: var(--red); background: rgba(204,0,0,0.09); }
+    .veh-tab-icon { font-size: 1.2rem; margin-bottom: 0.25rem; }
+    .veh-tab-name { font-size: 0.75rem; font-weight: 600; margin-bottom: 0.1rem; }
+    .veh-tab-eg { font-size: 0.62rem; color: var(--muted); }
+
+    /* ── Add-ons section (booking) ── */
+    .addons-bk { margin-top: 0.25rem; margin-bottom: 1rem; animation: stepIn 0.32s cubic-bezier(0.22,1,0.36,1) both; }
+    .addons-bk-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
+
+    .addon-tog { display: flex; align-items: center; gap: 0.75rem; background: rgba(255,255,255,0.03); border: 1.5px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 0.75rem 0.9rem; cursor: pointer; transition: all 0.18s; user-select: none; }
+    .addon-tog:hover { border-color: rgba(204,0,0,0.28); }
+    .addon-tog.on { border-color: var(--red); background: rgba(204,0,0,0.08); }
+    .at-check { width: 20px; height: 20px; border-radius: 5px; border: 1.5px solid rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.18s; }
+    .addon-tog.on .at-check { background: var(--red); border-color: var(--red); }
+    .at-check svg { width: 10px; height: 10px; stroke: #fff; stroke-width: 2.5; fill: none; opacity: 0; transition: opacity 0.18s; }
+    .addon-tog.on .at-check svg { opacity: 1; }
+    .at-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .at-info { flex: 1; min-width: 0; }
+    .at-name { font-size: 0.78rem; font-weight: 700; color: var(--white); margin-bottom: 0.08rem; line-height: 1.3; }
+    .at-price { font-size: 0.74rem; font-weight: 700; color: var(--red); }
+
+    /* ── Pet hair warning ── */
+    .pet-hair-bk { margin: 0.75rem 0 0.5rem; animation: stepIn 0.32s cubic-bezier(0.22,1,0.36,1) both; }
+    .ph-notice { display: flex; align-items: flex-start; gap: 0.85rem; background: rgba(255,180,0,0.06); border: 1.5px solid rgba(255,180,0,0.2); border-radius: 12px; padding: 1rem 1.15rem; margin-bottom: 0.65rem; }
+    .ph-notice-icon { font-size: 1.5rem; flex-shrink: 0; line-height: 1; }
+    .ph-notice-title { font-size: 0.82rem; font-weight: 700; color: rgba(255,200,60,0.9); margin-bottom: 0.25rem; }
+    .ph-notice-desc { font-size: 0.74rem; color: var(--muted); line-height: 1.55; }
+    .ph-toggle-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; background: rgba(255,255,255,0.03); border: 1.5px solid rgba(255,255,255,0.08); border-radius: 10px; cursor: pointer; transition: border-color 0.18s; }
+    .ph-toggle-row:hover { border-color: rgba(255,180,0,0.3); }
+    .ph-toggle-row.on { border-color: rgba(255,180,0,0.45); background: rgba(255,180,0,0.06); }
+    .ph-cb { width: 20px; height: 20px; border-radius: 5px; border: 1.5px solid rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.18s; }
+    .ph-toggle-row.on .ph-cb { background: rgba(255,180,0,0.75); border-color: rgba(255,180,0,0.75); }
+    .ph-cb svg { width: 10px; height: 10px; stroke: #fff; stroke-width: 2.5; fill: none; opacity: 0; transition: opacity 0.18s; }
+    .ph-toggle-row.on .ph-cb svg { opacity: 1; }
+    .ph-label { font-size: 0.8rem; font-weight: 600; color: var(--white); flex: 1; }
+    .ph-price-tag { font-size: 0.78rem; font-weight: 700; color: rgba(255,200,60,0.85); }
+
+    /* ── Price bar ── */
+    .price-bar { display: flex; align-items: center; justify-content: space-between; background: rgba(204,0,0,0.06); border: 1px solid rgba(204,0,0,0.16); border-radius: 12px; padding: 1rem 1.35rem; margin-bottom: 0.85rem; }
+    .pb-left { font-size: 0.85rem; color: var(--muted); }
+    .pb-left strong { color: var(--white); }
+    .pb-right { text-align: right; }
+    .pb-price { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--red); }
+    .pb-price.empty { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 400; color: var(--muted); opacity: 0.45; }
+    .pb-note { font-size: 0.68rem; color: var(--muted); }
+    .pb-addons { font-size: 0.7rem; color: rgba(204,0,0,0.7); margin-top: 0.1rem; }
+
+    /* ── Calendar ── */
+    .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem; }
+    .cal-month { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; }
+    .cal-arrow { width: 30px; height: 30px; border-radius: 7px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--chrome); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: all 0.2s; }
+    .cal-arrow:hover:not(:disabled) { border-color: rgba(204,0,0,0.35); color: var(--red); }
+    .cal-arrow:disabled { opacity: 0.25; cursor: not-allowed; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; margin-bottom: 1.25rem; }
+    .cal-dh { text-align: center; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding: 0.35rem 0; }
+    .cal-day { height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.84rem; font-weight: 500; border: none; background: transparent; cursor: pointer; color: var(--white); transition: background 0.16s, color 0.16s; width: 100%; }
+    .cal-day:hover:not(:disabled) { background: rgba(255,255,255,0.09); }
+    .cal-day.today { border: 1px solid rgba(204,0,0,0.3); }
+    .cal-day.selected { background: var(--red) !important; color: #fff !important; font-weight: 700; box-shadow: 0 0 14px rgba(204,0,0,0.4); }
+    .cal-day:disabled { color: rgba(255,255,255,0.15); cursor: not-allowed; }
+
+    /* Time slots */
+    .time-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 0.5rem; margin-bottom: 1.25rem; }
+    .t-slot { padding: 0.6rem 0.35rem; border-radius: 8px; text-align: center; font-size: 0.78rem; font-weight: 600; cursor: pointer; background: rgba(255,255,255,0.04); border: 1.5px solid rgba(255,255,255,0.08); color: var(--chrome); transition: all 0.16s; line-height: 1.3; }
+    .t-slot:hover:not(.booked) { border-color: rgba(204,0,0,0.3); color: var(--white); }
+    .t-slot.selected { border-color: var(--red); background: rgba(204,0,0,0.11); color: var(--white); }
+    .t-slot.booked { opacity: 0.3; cursor: not-allowed; }
+    .t-slot .booked-lbl { font-size: 0.54rem; letter-spacing: 0.04em; opacity: 0.7; display: block; }
+
+    /* ── Form ── */
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; }
+    .form-field { margin-bottom: 1rem; }
+    .form-label { display: block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.42rem; }
+    .form-input { width: 100%; padding: 0.75rem 1rem; border-radius: 9px; background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.1); color: var(--white); font-size: 0.88rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none; appearance: none; }
+    .form-input:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(204,0,0,0.1); }
+    .form-input::placeholder { color: rgba(255,255,255,0.18); }
+    textarea.form-input { resize: vertical; min-height: 80px; }
+    select.form-input { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; padding-right: 2.5rem; }
+    select.form-input option { background-color: #1a1a22; color: #f0f0f6; }
+    .form-opt { font-weight: 400; letter-spacing: 0; text-transform: none; font-size: 0.7rem; color: rgba(107,114,128,0.55); }
+    .fl-sm { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.65rem; display: block; }
+
+    /* ── Order summary ── */
+    .order-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 1.25rem; margin-bottom: 1.25rem; }
+    .order-box h4 { font-family: 'Inter', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+    .order-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.86rem; }
+    .order-row:last-child { border-bottom: none; }
+    .or-label { color: var(--muted); }
+    .or-value { font-weight: 600; text-align: right; max-width: 60%; }
+    .order-total { display: flex; justify-content: space-between; align-items: center; padding-top: 0.9rem; margin-top: 0.35rem; border-top: 1px solid rgba(204,0,0,0.2); }
+    .ot-label { font-size: 0.85rem; font-weight: 700; color: var(--chrome); }
+    .ot-price { font-family: 'Playfair Display', serif; font-size: 1.7rem; font-weight: 700; color: var(--red); }
+
+    /* ── Card inputs ── */
+    .card-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; }
+    .secure-note { display: flex; align-items: center; gap: 0.5rem; font-size: 0.7rem; color: var(--muted); margin-bottom: 1.1rem; }
+    .secure-note svg { color: rgba(204,0,0,0.5); flex-shrink: 0; }
+
+    /* ── Confirmation ── */
+    .confirm-wrap { text-align: center; padding: 2rem 1.5rem; }
+    .conf-check { width: 78px; height: 78px; border-radius: 50%; margin: 0 auto 1.5rem; background: rgba(204,0,0,0.1); border: 2px solid rgba(204,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 2rem; animation: popIn 0.55s cubic-bezier(0.34,1.56,0.64,1) 0.15s both; }
+    @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .confirm-wrap h2 { font-size: 2rem; margin-bottom: 0.6rem; }
+    .confirm-wrap > p { color: var(--muted); font-size: 0.92rem; max-width: 380px; margin: 0 auto 2rem; line-height: 1.72; }
+    .conf-details { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 1.25rem; text-align: left; max-width: 420px; margin: 0 auto; }
+    .conf-details h4 { font-family: 'Inter', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+    .conf-note { margin-top: 1.5rem; font-size: 0.8rem; color: var(--muted); }
+    .conf-note a { color: var(--red); font-weight: 600; transition: opacity 0.2s; }
+    .conf-note a:hover { opacity: 0.75; }
+
+    /* ── Step nav (back button) ── */
+    .back-btn { display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; font-weight: 600; color: var(--muted); cursor: pointer; background: none; border: none; transition: color 0.2s; }
+    .back-btn:hover { color: var(--white); }
+    .back-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* Step 5 confirmation layout */
+    #sp5 .sp-inner { justify-content: center; align-items: center; }
+    #sp5 .sp-content { flex: unset; overflow: visible; }
+
+    /* ── 370 King note ── */
+    .king-note { display: none; margin-top: 0.5rem; font-size: 0.76rem; color: var(--muted); padding: 0.55rem 0.9rem; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid rgba(255,255,255,0.07); }
+
+    /* ──────────────────
+       REVIEWS
+    ────────────────── */
+    #reviews { padding: 7rem 0; background: var(--card); border-top: 1px solid var(--border); }
+    .rev-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; position: relative; z-index: 1; }
+    .rev-card { background: var(--elevated); border: 1px solid var(--border); border-radius: 14px; padding: 2rem; transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s; }
+    .rev-card:hover { transform: translateY(-4px); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+    .rev-src { display: flex; align-items: center; gap: 0.4rem; font-size: 0.7rem; color: var(--muted); margin-bottom: 0.75rem; }
+    .g-dot { width: 8px; height: 8px; border-radius: 50%; background: #4285F4; flex-shrink: 0; }
+    .rev-stars { color: var(--red); margin-bottom: 0.9rem; letter-spacing: 0.04em; }
+    .rev-quote { font-size: 0.9rem; color: var(--chrome); font-style: italic; line-height: 1.72; margin-bottom: 1.5rem; }
+    .rev-author { display: flex; align-items: center; gap: 0.85rem; }
+    .rev-avatar { width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0; background: linear-gradient(135deg, #1e0808, #2e1010); border: 2px solid rgba(204,0,0,0.28); display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; color: rgba(220,80,80,0.9); }
+    .rev-name { font-size: 0.875rem; font-weight: 600; }
+    .rev-meta { font-size: 0.72rem; color: var(--muted); }
+
+    /* ──────────────────
+       FOOTER
+    ────────────────── */
+    footer { background: var(--card); border-top: 1px solid var(--border); padding: 4rem 0 2rem; }
+    .foot-grid { display: grid; grid-template-columns: 2fr 1fr 1.5fr; gap: 3rem; padding-bottom: 2.5rem; border-bottom: 1px solid var(--border); }
+    .foot-logo { height: 48px; mix-blend-mode: screen; display: block; margin-bottom: 1rem; }
+    .foot-tag { font-size: 0.875rem; color: var(--muted); max-width: 250px; line-height: 1.72; }
+    .foot-disc { margin-top: 1.5rem; font-size: 0.68rem; color: rgba(107,114,128,0.5); max-width: 275px; line-height: 1.6; }
+    footer h4 { font-family: 'Inter', sans-serif; font-size: 0.67rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--chrome); margin-bottom: 1.2rem; }
+    footer ul { list-style: none; display: flex; flex-direction: column; gap: 0.65rem; }
+    footer ul a { font-size: 0.875rem; color: var(--muted); transition: color 0.2s; }
+    footer ul a:hover { color: var(--white); }
+    .crow { display: flex; gap: 0.75rem; margin-bottom: 0.75rem; font-size: 0.875rem; color: var(--muted); align-items: flex-start; }
+    .cico { color: var(--red); flex-shrink: 0; }
+    .foot-bot { display: flex; justify-content: space-between; align-items: center; padding-top: 1.75rem; }
+    .foot-bot p { font-size: 0.78rem; color: var(--muted); }
+    .foot-bot strong { color: var(--red); }
+    .socials { display: flex; gap: 0.65rem; }
+    .soc { width: 34px; height: 34px; border-radius: 7px; background: var(--elevated); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--muted); transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+    .soc:hover { border-color: var(--red); color: var(--red); transform: translateY(-3px); }
+
+    /* ──────────────────
+       RESPONSIVE
+    ────────────────── */
+    @media (max-width: 1100px) {
+      .det-cards-page    { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 960px) {
+      .det-cards-page    { grid-template-columns: 1fr 1fr; }
+      .det-grid-bk       { grid-template-columns: 1fr 1fr; }
+      .addons-page-grid  { grid-template-columns: repeat(3, 1fr); }
+      .addons-bk-grid    { grid-template-columns: 1fr 1fr; }
+      .rev-grid          { grid-template-columns: 1fr 1fr; }
+      .foot-grid         { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 640px) {
+      #nav { padding: 0.55rem 1.25rem; }
+      .nav-phone { display: none; }
+      .det-cards-page    { grid-template-columns: 1fr; }
+      .det-grid-bk       { grid-template-columns: 1fr; }
+      #bkOverlay .det-grid-bk { grid-template-columns: 1fr; }
+      .addons-page-grid  { grid-template-columns: 1fr 1fr; }
+      .addons-bk-grid    { grid-template-columns: 1fr 1fr; }
+      .bko-hd            { padding: 0.65rem 1rem; }
+      .bko-prog          { margin: 0 1rem; max-width: none; }
+      .sp-inner          { padding: 0 1rem; }
+      .form-row          { grid-template-columns: 1fr; }
+      .card-row          { grid-template-columns: 1fr; }
+      .veh-tabs          { flex-direction: column; }
+      .time-grid         { grid-template-columns: repeat(3, 1fr); }
+      .rev-grid          { grid-template-columns: 1fr; }
+      .foot-grid         { grid-template-columns: 1fr; }
+      .foot-bot          { flex-direction: column; gap: 1rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════ NAV ═══════════ -->
+<nav id="nav">
+  <a href="#hero">
+    <img src="Brand_Assets/5A7CE0AD-9F3E-4AFF-BA8A-B0B5DE19BA9A.PNG" alt="MrShine Car Wash &amp; Detailing" class="brand-logo">
+  </a>
+  <div class="nav-right">
+    <a href="tel:+14164535077" class="nav-phone">📞 416-453-5077</a>
+    <button class="btn btn-primary" style="padding:0.55rem 1.4rem;font-size:0.77rem;" onclick="openBookingOverlay()">Book Now →</button>
+  </div>
+</nav>
+
+<!-- ═══════════ HERO ═══════════ -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="noise"></div>
+  <div class="container">
+    <div class="hero-inner">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        Online Booking Open · Toronto
+      </div>
+      <h1>
+        <span class="chrome-text">Book Your<br>Next</span>
+        <br><em>Detail.</em>
+      </h1>
+      <p class="hero-sub">Choose your service, pick a time, and pay securely online. Your spot is locked in — no phone tag, no waiting.</p>
+      <div class="hero-cta">
+        <button class="btn btn-primary" onclick="openBookingOverlay()">Book Now →</button>
+        <a href="#services" class="btn btn-ghost">View Services</a>
+      </div>
+      <div class="hero-trust">
+        <div class="ht-item"><strong>350+</strong>&nbsp;5-Star Reviews</div>
+        <span class="ht-dot"></span>
+        <div class="ht-item"><strong>10+</strong>&nbsp;Years in Toronto</div>
+        <span class="ht-dot"></span>
+        <div class="ht-item"><strong>100%</strong>&nbsp;Hand Washed</div>
+        <span class="ht-dot"></span>
+        <div class="ht-item"><strong>2</strong>&nbsp;Locations</div>
+      </div>
+      <div style="margin-top:1.75rem;font-size:0.75rem;color:rgba(107,114,128,0.55);letter-spacing:0.02em;">
+        Walk-ins welcome for express hand washes — no appointment needed
+      </div>
+    </div>
+  </div>
+  <div class="hero-bottom-line"></div>
+</section>
+
+<!-- ═══════════ SERVICES (public) ═══════════ -->
+<section id="services">
+  <div class="container" style="padding-bottom:5rem;">
+    <div class="sec-head center">
+      <div class="eyebrow">What We Offer</div>
+      <h2>Detailing packages &amp; add-ons</h2>
+      <p>Every detail is 100% hand-done by our team. Select a package below, then add extras at checkout.</p>
+    </div>
+
+    <!-- Walk-in note -->
+    <div style="text-align:center;margin-bottom:2.25rem;">
+      <span style="display:inline-flex;align-items:center;gap:0.5rem;font-size:0.8rem;color:#888;padding:0.5rem 1.3rem;background:rgba(11,11,13,0.05);border:1px solid rgba(11,11,13,0.1);border-radius:100px;">
+        👋 Walk-ins welcome for express hand washes · No appointment needed for basic services
+      </span>
+    </div>
+
+    <!-- ── Detailing Packages ── -->
+    <div style="margin-bottom:1.5rem;">
+      <div style="display:flex;align-items:center;gap:1.25rem;margin-bottom:1.75rem;">
+        <div style="font-family:'Inter',sans-serif;font-size:0.7rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#888;white-space:nowrap;">Detailing Packages</div>
+        <div style="flex:1;height:1px;background:linear-gradient(to right,rgba(204,0,0,0.3),transparent);"></div>
+      </div>
+      <div class="det-cards-page">
+
+        <!-- Exterior Detail -->
+        <div class="det-card-page">
+          <span class="dcp-icon">💧</span>
+          <div class="dcp-header"><div class="dcp-name">Exterior Detail</div></div>
+          <div class="dcp-meta">
+            <span class="dcp-price">From $79.99</span>
+            <span class="dcp-dur">⏱ 1 hr</span>
+          </div>
+          <div class="dcp-size-note"><span>Compact SUV +$10</span> · <span>Large Vehicle +$20</span></div>
+          <div class="dcp-divider"></div>
+          <ul class="svc-checklist">
+            <li>Hand wash &amp; dry</li><li>Wheel &amp; rim detail</li><li>Wheel well cleaning</li>
+            <li>Bug &amp; tar removal</li><li>Door jamb cleaning</li><li>Streak-free window clean</li>
+            <li>Spray wax application</li><li>Tire shine &amp; dressing</li>
+          </ul>
+          <button class="btn-book" onclick="openBookingFor('exterior-detail')" style="margin-top:auto;">Book Now →</button>
+        </div>
+
+        <!-- Interior Detail -->
+        <div class="det-card-page">
+          <span class="dcp-icon">🛋️</span>
+          <div class="dcp-header"><div class="dcp-name">Interior Detail</div></div>
+          <div class="dcp-meta">
+            <span class="dcp-price">From $199.99</span>
+            <span class="dcp-dur">⏱ 2 hrs</span>
+          </div>
+          <div class="dcp-size-note"><span>Compact SUV +$20</span> · <span>Large Vehicle +$40</span></div>
+          <div class="dcp-divider"></div>
+          <ul class="svc-checklist">
+            <li>Full vacuum throughout</li><li>Steam cleaning</li><li>Salt stain removal</li>
+            <li>Leather conditioning</li><li>Vinyl &amp; plastic protection</li><li>Carpet shampoo</li>
+            <li>Floor mat deep clean</li><li>Air vent cleaning</li><li>Window cleaning (interior)</li>
+          </ul>
+          <button class="btn-book" onclick="openBookingFor('interior-detail')" style="margin-top:auto;">Book Now →</button>
+        </div>
+
+        <!-- Full Detail -->
+        <div class="det-card-page">
+          <div class="pop-tag">★ Most Popular</div>
+          <span class="dcp-icon">✨</span>
+          <div class="dcp-header"><div class="dcp-name">Full Detail</div></div>
+          <div class="dcp-meta">
+            <span class="dcp-price">From $279.98</span>
+            <span class="dcp-dur">⏱ 3 hrs</span>
+          </div>
+          <div class="dcp-size-note"><span>Compact SUV +$30</span> · <span>Large Vehicle +$60</span></div>
+          <div class="dcp-divider"></div>
+          <ul class="svc-checklist">
+            <li>Hand wash &amp; dry</li><li>Wheel &amp; rim detail</li><li>Bug &amp; tar removal</li>
+            <li>Spray wax &amp; tire shine</li><li>Full vacuum throughout</li><li>Steam cleaning</li>
+            <li>Leather conditioning</li><li>Carpet shampoo</li><li>Salt stain removal</li>
+            <li>Window cleaning (int + ext)</li>
+          </ul>
+          <button class="btn-book" onclick="openBookingFor('full-detail')" style="margin-top:auto;">Book Now →</button>
+        </div>
+
+        <!-- Ceramic Coating -->
+        <div class="det-card-page" style="border-top:3px solid #a07820;background:linear-gradient(160deg,#fff 70%,#faf8f2);">
+          <div class="pop-tag" style="background:rgba(160,120,32,0.08);border-color:rgba(160,120,32,0.25);color:rgba(140,100,20,0.9);">⭐ Premium</div>
+          <span class="dcp-icon">🛡️</span>
+          <div class="dcp-header"><div class="dcp-name">Ceramic Coating</div></div>
+          <div class="dcp-meta">
+            <span class="dcp-price" style="color:#a07820;">From $599.99</span>
+            <span class="dcp-dur">⏱ Full Day</span>
+          </div>
+          <div class="dcp-size-note"><span style="color:rgba(140,100,20,0.8);">Compact SUV $699.99</span> · <span style="color:rgba(140,100,20,0.8);">Large Vehicle $799.99</span></div>
+          <div style="font-size:0.72rem;font-weight:700;color:rgba(30,140,70,0.85);margin-bottom:0.4rem;">✓ Full Exterior Detail included in price</div>
+          <div style="font-size:0.7rem;font-weight:700;color:rgba(160,120,32,0.9);margin-bottom:0.85rem;">🛡️ 7+ Year Warranty</div>
+          <div class="dcp-divider"></div>
+          <ul class="svc-checklist">
+            <li>Inspection — swirl marks, scratches, water spots, tar, sap, iron contamination &amp; existing coatings</li>
+            <li>Exterior Detail (Deep Wash)</li>
+            <li>Chemical Decontamination</li>
+            <li>Clay Bar Treatment</li>
+            <li>Paint Correction</li>
+            <li>Panel Prep</li>
+            <li>Ceramic Application</li>
+            <li>Level &amp; Buff excess and high spots</li>
+            <li>Cure time 12–24 hours</li>
+          </ul>
+          <div style="font-size:0.7rem;color:#aaa;margin-bottom:1rem;font-style:italic;">Optional add-ons: Wheels +$199 · Windows +$199</div>
+          <button class="btn-book" onclick="openBookingFor('ceramic-coating')" style="margin-top:auto;background:#a07820;box-shadow:0 0 18px rgba(160,120,32,0.3);">Book Now →</button>
+        </div>
+
+      </div>
+    </div>
+
+    <p style="text-align:center;font-size:0.78rem;color:#999;font-style:italic;padding-bottom:0.25rem;">* Prices vary by vehicle condition. All detailing bookings require advance payment.</p>
+  </div>
+
+  <!-- ── Add-Ons ── -->
+  <div class="addons-page-section">
+    <div class="container">
+      <div class="sec-head center" style="margin-bottom:3rem;">
+        <div class="eyebrow" style="color:rgba(204,0,0,0.75);">Enhance Your Detail</div>
+        <h2 style="color:var(--white);">Add-On Services</h2>
+        <p style="color:var(--muted);">Select any add-on during checkout when booking your detail package.</p>
+      </div>
+      <div class="addons-page-grid">
+        <div class="addon-page-card">
+          <span class="apc-icon">⚙️</span>
+          <div class="apc-name">Engine Bay Detail</div>
+          <div class="apc-desc">Professional degreasing &amp; dressing of the full engine bay.</div>
+          <div class="apc-price">$79.99</div>
+        </div>
+        <div class="addon-page-card">
+          <span class="apc-icon">💡</span>
+          <div class="apc-name">Headlight Restoration</div>
+          <div class="apc-desc">Restore cloudy, yellowed headlights to crystal clarity.</div>
+          <div class="apc-price">$119.99</div>
+        </div>
+        <div class="addon-page-card">
+          <span class="apc-icon">✨</span>
+          <div class="apc-name">Wax &amp; Buff</div>
+          <div class="apc-desc">Full paint correction and wax for a showroom-quality finish.</div>
+          <div class="apc-price">From $249.99</div>
+        </div>
+        <div class="addon-page-card">
+          <span class="apc-icon">🔩</span>
+          <div class="apc-name">Undercarriage Wash</div>
+          <div class="apc-desc">High-pressure clean of the full undercarriage &amp; frame.</div>
+          <div class="apc-price">$29.99</div>
+        </div>
+        <div class="addon-page-card">
+          <span class="apc-icon">🪑</span>
+          <div class="apc-name">Seat Restoration</div>
+          <div class="apc-desc">Deep clean and restoration of all seat fabric &amp; surfaces.</div>
+          <div class="apc-price">$49.99</div>
+        </div>
+        <div class="addon-page-card">
+          <span class="apc-icon">💎</span>
+          <div class="apc-name">Liquid Wax Protection</div>
+          <div class="apc-desc">Premium liquid wax coating for lasting paint protection.</div>
+          <div class="apc-price">From $54.99</div>
+        </div>
+        <div class="addon-page-card">
+          <span class="apc-icon">🌿</span>
+          <div class="apc-name">Odour Removal</div>
+          <div class="apc-desc">Eliminate stubborn odours from the interior completely.</div>
+          <div class="apc-price">$59.99</div>
+        </div>
+        <div class="addon-page-card">
+          <span class="apc-icon">🪞</span>
+          <div class="apc-name">Interior Polishing</div>
+          <div class="apc-desc">We polish interior plastics back to their glossy original finish — combats scratches from keys and coins around the infotainment area and trim.</div>
+          <div class="apc-price">From $59.99</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ BOOKING CTA ═══════════ -->
+<section id="booking">
+  <div style="position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:800px;height:400px;pointer-events:none;background:radial-gradient(ellipse,rgba(204,0,0,0.07) 0%,transparent 62%);"></div>
+  <div class="container" style="position:relative;z-index:1;text-align:center;">
+    <div class="eyebrow">Reserve Your Detail</div>
+    <h2 style="font-size:clamp(2rem,4vw,3rem);font-weight:700;letter-spacing:-0.03em;margin-bottom:1rem;color:var(--white);">Ready when you are.</h2>
+    <p style="color:var(--muted);font-size:0.975rem;max-width:460px;margin:0 auto 2.5rem;line-height:1.75;">Choose your service, pick a time, and pay securely online. Booking takes under 2 minutes.</p>
+    <button class="btn btn-primary" style="font-size:0.92rem;padding:1rem 2.4rem;" onclick="openBookingOverlay()">Book Now →</button>
+  </div>
+</section>
+
+<!-- ═══════════ REVIEWS ═══════════ -->
+<section id="reviews">
+  <div class="container">
+    <div class="sec-head center">
+      <div class="eyebrow">Customer Reviews</div>
+      <h2>350+ Five-Star Reviews</h2>
+      <p>Hear directly from Toronto customers who trust us with their vehicles.</p>
+    </div>
+    <div class="rev-grid">
+      <div class="rev-card">
+        <div class="rev-src"><span class="g-dot"></span>Google Review</div>
+        <div class="rev-stars">★★★★★</div>
+        <p class="rev-quote">"Fantastic hand car wash! The team are friendly, professional, and incredibly thorough. Car looks spotless inside and out — they paid great attention to detail and didn't miss a thing. Quick service, fair pricing, excellent results."</p>
+        <div class="rev-author"><div class="rev-avatar">JM</div><div><div class="rev-name">Jose Monteiro</div><div class="rev-meta">Toronto</div></div></div>
+      </div>
+      <div class="rev-card">
+        <div class="rev-src"><span class="g-dot"></span>Google Review</div>
+        <div class="rev-stars">★★★★★</div>
+        <p class="rev-quote">"They were amazing!! Very knowledgeable. My car was in rough shape with three kids and a busy schedule up to the farm. My car has never looked better!! Thank you MrShine!"</p>
+        <div class="rev-author"><div class="rev-avatar">JR</div><div><div class="rev-name">Jessica Roeder</div><div class="rev-meta">Toronto</div></div></div>
+      </div>
+      <div class="rev-card">
+        <div class="rev-src"><span class="g-dot"></span>Google Review</div>
+        <div class="rev-stars">★★★★★</div>
+        <p class="rev-quote">"Best auto detailer in Toronto — amazing service and amazing price for all that you get."</p>
+        <div class="rev-author"><div class="rev-avatar">IM</div><div><div class="rev-name">Isaac Mohamed</div><div class="rev-meta">Toronto</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer id="contact">
+  <div class="container">
+    <div class="foot-grid">
+      <div>
+        <img src="Brand_Assets/5A7CE0AD-9F3E-4AFF-BA8A-B0B5DE19BA9A.PNG" alt="MrShine" class="foot-logo">
+        <p class="foot-tag">Toronto's trusted hand car wash and detailing service. Crafted with care, finished to perfection.</p>
+        <p class="foot-disc">We are not responsible for any lost, stolen, or damaged personal items left in vehicles. While we take the utmost care, we are not liable for pre-existing damage or unforeseen issues that may arise during service.</p>
+      </div>
+      <div>
+        <h4>Services</h4>
+        <ul>
+          <li><a href="#services">Exterior Detail</a></li>
+          <li><a href="#services">Interior Detail</a></li>
+          <li><a href="#services">Full Detail</a></li>
+          <li><a href="#services">Add-On Services</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Locations</h4>
+        <div class="crow"><span class="cico">📍</span><span>10 Lower Jarvis St.<br><span style="font-size:0.8rem;opacity:0.7;">Corktown / Waterfront</span></span></div>
+        <div class="crow"><span class="cico">📍</span><span>370 King St. W<br><span style="font-size:0.8rem;opacity:0.7;">Entertainment District</span></span></div>
+        <div class="crow"><span class="cico">📞</span><span>
+          <a href="tel:+14164535077" style="transition:color 0.2s;" onmouseover="this.style.color='#cc0000'" onmouseout="this.style.color='inherit'">416-453-5077</a><br>
+          <a href="tel:+16473235158" style="transition:color 0.2s;" onmouseover="this.style.color='#cc0000'" onmouseout="this.style.color='inherit'">647-323-5158</a>
+        </span></div>
+        <div style="margin-top:1.25rem;">
+          <button class="btn-book" onclick="openBookingOverlay()">Book Online →</button>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bot">
+      <p>© 2026 <strong>MrShine Car Wash &amp; Detailing</strong>. All rights reserved. · <a href="admin.html" style="color:rgba(107,114,128,0.35);font-size:0.72rem;">Admin</a></p>
+      <div class="socials">
+        <a href="#" class="soc" aria-label="Instagram"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.1" fill="currentColor" stroke-width="3"/></svg></a>
+        <a href="#" class="soc" aria-label="Facebook"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+        <a href="#" class="soc" aria-label="TikTok"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.72a4.85 4.85 0 0 1-1.01-.03z"/></svg></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════ FULL-SCREEN BOOKING OVERLAY ═══════════ -->
+<div id="bkOverlay">
+
+  <!-- Overlay Header -->
+  <div class="bko-hd">
+    <img src="Brand_Assets/5A7CE0AD-9F3E-4AFF-BA8A-B0B5DE19BA9A.PNG" alt="MrShine" class="bko-logo">
+    <div class="bko-prog booking-progress" id="bProg">
+      <div class="prog-step active" data-s="1"><div class="prog-num"><span>1</span></div><span class="prog-label">Service</span></div>
+      <div class="prog-connector" id="pc1"></div>
+      <div class="prog-step" data-s="2"><div class="prog-num"><span>2</span></div><span class="prog-label">Schedule</span></div>
+      <div class="prog-connector" id="pc2"></div>
+      <div class="prog-step" data-s="3"><div class="prog-num"><span>3</span></div><span class="prog-label">Details</span></div>
+      <div class="prog-connector" id="pc3"></div>
+      <div class="prog-step" data-s="4"><div class="prog-num"><span>4</span></div><span class="prog-label">Payment</span></div>
+    </div>
+    <button class="bko-close" onclick="closeBookingOverlay()" aria-label="Close booking">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="1" y1="1" x2="13" y2="13"/><line x1="13" y1="1" x2="1" y2="13"/></svg>
+    </button>
+  </div>
+
+  <!-- Overlay Body -->
+  <div class="bko-body">
+
+    <!-- ══ STEP 1: Service + Vehicle + Add-ons ══ -->
+    <div class="step-panel active" id="sp1">
+      <div class="sp-inner">
+        <div class="sp-head">
+          <h2 class="step-title">Choose your service</h2>
+          <p class="step-sub">Select a detailing package, then choose your vehicle size.</p>
+        </div>
+        <div class="sp-content">
+
+          <div class="bk-section-hd" style="margin-top:0;">
+            <span class="bk-section-label">Detailing Packages</span>
+            <div class="bk-section-line"></div>
+          </div>
+          <div class="det-grid-bk" id="detGrid"></div>
+
+          <span class="fl-sm">Vehicle Size</span>
+          <div class="veh-tabs" id="vehTabs">
+            <div class="veh-tab active" data-sz="sedan">
+              <div class="veh-tab-icon">🚗</div>
+              <div class="veh-tab-name">Sedan / Coupe</div>
+              <div class="veh-tab-eg">Civic, Camry, 3 Series</div>
+            </div>
+            <div class="veh-tab" data-sz="suv">
+              <div class="veh-tab-icon">🚙</div>
+              <div class="veh-tab-name">Compact SUV</div>
+              <div class="veh-tab-eg">RAV4, CR-V, Escape</div>
+            </div>
+            <div class="veh-tab" data-sz="large">
+              <div class="veh-tab-icon">🛻</div>
+              <div class="veh-tab-name">Large Vehicle</div>
+              <div class="veh-tab-eg">Truck, Full SUV, Van</div>
+            </div>
+          </div>
+
+          <div id="petHairSection" style="display:none;" class="pet-hair-bk">
+            <div class="ph-notice">
+              <div class="ph-notice-icon">🐾</div>
+              <div>
+                <div class="ph-notice-title">Does your vehicle have excessive pet hair?</div>
+                <div class="ph-notice-desc">If so, no worries — we've seen it all! Just check the box below so we can set aside extra time. If we discover significant pet hair at your appointment without advance notice, an additional charge will need to be applied on the day of service.</div>
+              </div>
+            </div>
+            <div class="ph-toggle-row" id="petHairToggle" onclick="togglePetHair()">
+              <div class="ph-cb"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <span class="ph-label">Yes, my vehicle has excessive pet hair</span>
+              <span class="ph-price-tag" id="petHairPriceTag"></span>
+            </div>
+          </div>
+
+          <div id="addonsSection" style="display:none;" class="addons-bk">
+            <div class="bk-section-hd" style="margin-top:0.25rem;">
+              <span class="bk-section-label">Add-Ons</span>
+              <span style="font-size:0.65rem;color:var(--muted);margin-left:0.45rem;">(optional)</span>
+              <div class="bk-section-line"></div>
+            </div>
+            <div class="addons-bk-grid" id="addonsGrid"></div>
+          </div>
+
+        </div>
+        <div class="sp-footer">
+          <div class="price-bar">
+            <div class="pb-left">
+              <strong id="pb-svc">Select a service above</strong><br>
+              <span id="pb-sz">Sedan / Coupe</span>
+            </div>
+            <div class="pb-right">
+              <div class="pb-price empty" id="pb-price">—</div>
+              <div class="pb-addons" id="pb-addons" style="display:none;"></div>
+              <div class="pb-note">All taxes included</div>
+            </div>
+          </div>
+          <div id="s1scrollHint" style="text-align:center;font-size:0.7rem;color:rgba(204,0,0,0.65);letter-spacing:0.06em;margin-bottom:0.55rem;display:none;">↓ Scroll through all options to continue</div>
+          <button class="btn btn-primary btn-full" id="s1next" onclick="goStep(2)" disabled>Continue to Schedule →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ STEP 2: Location + Schedule ══ -->
+    <div class="step-panel" id="sp2">
+      <div class="sp-inner">
+        <div class="sp-head">
+          <h2 class="step-title">Location &amp; schedule</h2>
+          <p class="step-sub">Mon–Sat at both locations. Last booking at 5:00 PM. 370 King closed Sundays.</p>
+        </div>
+        <div class="sp-content">
+
+          <div class="form-field" style="margin-bottom:1.25rem;">
+            <label class="form-label" for="f-location">📍 Select Location</label>
+            <select class="form-input" id="f-location" onchange="onLocationChange()">
+              <option value="">Choose your preferred location...</option>
+              <option value="10 Lower Jarvis St.">10 Lower Jarvis St. — Corktown / Waterfront</option>
+              <option value="370 King St. W">370 King St. W — Entertainment District</option>
+            </select>
+            <div class="king-note" id="kingnote">ℹ️ 370 King St. W is closed on Sundays — those dates are greyed out.</div>
+          </div>
+
+          <div class="cal-nav">
+            <button class="cal-arrow" id="calPrev" onclick="shiftMonth(-1)">&#8592;</button>
+            <div class="cal-month" id="calTitle"></div>
+            <button class="cal-arrow" id="calNext" onclick="shiftMonth(1)">&#8594;</button>
+          </div>
+          <div class="cal-grid" id="calGrid"></div>
+
+          <div id="timeBlock" style="display:none;">
+            <span class="fl-sm">Available Times</span>
+            <div class="time-grid" id="timeGrid"></div>
+          </div>
+
+        </div>
+        <div class="sp-footer">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <button class="back-btn" onclick="goStep(1)">
+              <svg viewBox="0 0 14 14"><path d="M9 11L5 7l4-4"/></svg>
+              Back
+            </button>
+            <button class="btn btn-primary" id="s2next" onclick="goStep(3)" disabled>Continue to Details →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ STEP 3: Contact Details ══ -->
+    <div class="step-panel" id="sp3">
+      <div class="sp-inner">
+        <div class="sp-head">
+          <h2 class="step-title">Your details</h2>
+          <p class="step-sub">We'll use these to confirm your booking and send a confirmation email.</p>
+        </div>
+        <div class="sp-content">
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label" for="f-fname">First Name</label>
+              <input class="form-input" id="f-fname" type="text" placeholder="Jane" autocomplete="given-name">
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="f-lname">Last Name</label>
+              <input class="form-input" id="f-lname" type="text" placeholder="Smith" autocomplete="family-name">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label" for="f-email">Email</label>
+              <input class="form-input" id="f-email" type="email" placeholder="jane@email.com" autocomplete="email">
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="f-phone">Phone</label>
+              <input class="form-input" id="f-phone" type="tel" placeholder="416-555-0123" autocomplete="tel">
+            </div>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="f-vehicle">Vehicle <span style="font-size:0.7rem;font-weight:400;letter-spacing:0;text-transform:none;">(Year, Make, Model)</span></label>
+            <input class="form-input" id="f-vehicle" type="text" placeholder="e.g. 2021 Honda Civic">
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="f-notes">Special Instructions <span class="form-opt">(optional)</span></label>
+            <textarea class="form-input" id="f-notes" placeholder="Pet hair, specific stains, anything we should know..."></textarea>
+          </div>
+        </div>
+        <div class="sp-footer">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <button class="back-btn" onclick="goStep(2)">
+              <svg viewBox="0 0 14 14"><path d="M9 11L5 7l4-4"/></svg>
+              Back
+            </button>
+            <button class="btn btn-primary" onclick="validateStep3()">Review &amp; Pay →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ STEP 4: Payment ══ -->
+    <div class="step-panel" id="sp4">
+      <div class="sp-inner">
+        <div class="sp-head">
+          <h2 class="step-title">Secure payment</h2>
+          <p class="step-sub">Your booking is held the moment payment is confirmed.</p>
+        </div>
+        <div class="sp-content">
+          <div class="order-box">
+            <h4>Booking Summary</h4>
+            <div class="order-row"><span class="or-label">Service</span><span class="or-value" id="ov-svc">—</span></div>
+            <div class="order-row"><span class="or-label">Vehicle Size</span><span class="or-value" id="ov-sz">—</span></div>
+            <div id="ov-addons-rows"></div>
+            <div class="order-row"><span class="or-label">Location</span><span class="or-value" id="ov-loc">—</span></div>
+            <div class="order-row"><span class="or-label">Date</span><span class="or-value" id="ov-date">—</span></div>
+            <div class="order-row"><span class="or-label">Time</span><span class="or-value" id="ov-time">—</span></div>
+            <div class="order-row"><span class="or-label">Name</span><span class="or-value" id="ov-name">—</span></div>
+            <div class="order-total">
+              <span class="ot-label">Total Due Today</span>
+              <span class="ot-price" id="ov-total">—</span>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label" for="cc-name">Cardholder Name</label>
+            <input class="form-input" id="cc-name" type="text" placeholder="Jane Smith" autocomplete="cc-name">
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="cc-num">Card Number</label>
+            <input class="form-input" id="cc-num" type="text" placeholder="1234 5678 9012 3456" maxlength="19" autocomplete="cc-number" oninput="fmtCard(this)">
+          </div>
+          <div class="card-row">
+            <div class="form-field">
+              <label class="form-label" for="cc-exp">Expiry</label>
+              <input class="form-input" id="cc-exp" type="text" placeholder="MM / YY" maxlength="7" autocomplete="cc-exp" oninput="fmtExp(this)">
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="cc-cvv">CVV</label>
+              <input class="form-input" id="cc-cvv" type="text" placeholder="123" maxlength="4" autocomplete="cc-csc">
+            </div>
+          </div>
+
+          <div class="secure-note">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Your payment is encrypted and secure. Card details are never stored.
+          </div>
+        </div>
+        <div class="sp-footer">
+          <button class="btn btn-primary btn-full" id="payBtn" onclick="submitBooking()" style="margin-bottom:0.75rem;">
+            Confirm Booking &amp; Pay <span id="payAmt"></span>
+          </button>
+          <button class="back-btn" onclick="goStep(3)">
+            <svg viewBox="0 0 14 14"><path d="M9 11L5 7l4-4"/></svg>
+            Back
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ STEP 5: Confirmation ══ -->
+    <div class="step-panel" id="sp5">
+      <div class="sp-inner">
+        <div class="sp-content" style="display:flex;align-items:center;justify-content:center;">
+          <div class="confirm-wrap">
+            <div class="conf-check">✓</div>
+            <h2>You're booked!</h2>
+            <p>Your booking is confirmed. A full confirmation with all your appointment details has been sent to your email — that's your receipt, keep it handy.</p>
+            <div class="conf-details">
+              <h4>Booking Confirmation</h4>
+              <div class="order-row"><span class="or-label">Service</span><span class="or-value" id="cf-svc">—</span></div>
+              <div class="order-row"><span class="or-label">Location</span><span class="or-value" id="cf-loc">—</span></div>
+              <div class="order-row"><span class="or-label">Date &amp; Time</span><span class="or-value" id="cf-dt">—</span></div>
+              <div class="order-row"><span class="or-label">Vehicle</span><span class="or-value" id="cf-veh">—</span></div>
+              <div class="order-row"><span class="or-label">Amount Paid</span><span class="or-value" id="cf-amt" style="color:var(--red);">—</span></div>
+            </div>
+            <p class="conf-note">Need to make a change? Call <a href="tel:+14164535077">416-453-5077</a> or <a href="tel:+16473235158">647-323-5158</a></p>
+            <button class="btn btn-ghost" onclick="closeBookingOverlay()" style="margin-top:1.5rem;">← Back to Site</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end bko-body -->
+</div><!-- end bkOverlay -->
+
+<script>
+// ══════════════════════════════════════
+// EMAIL JS CONFIG
+// To enable email confirmations:
+// 1. Sign up free at https://emailjs.com
+// 2. Connect your Gmail (mrshinetoronto@gmail.com) as a service
+// 3. Create two email templates: one for the business, one for the customer
+// 4. Replace the placeholder strings below with your real IDs
+// ══════════════════════════════════════
+const EMAILJS_CONFIG = {
+  publicKey:       'YOUR_PUBLIC_KEY',
+  serviceId:       'YOUR_SERVICE_ID',
+  bizTemplateId:   'template_business',
+  custTemplateId:  'template_customer'
+};
+
+// ══════════════════════════════════════
+// DATA
+// ══════════════════════════════════════
+const SERVICES = [
+  {
+    id: 'exterior-detail', name: 'Exterior Detail', icon: '💧', dur: '1 hr',
+    prices: { sedan: 79.99, suv: 89.99, large: 99.99 },
+    items: ['Hand wash & dry','Wheel & rim detail','Wheel well cleaning','Bug & tar removal','Door jamb cleaning','Streak-free window clean','Spray wax application','Tire shine & dressing']
+  },
+  {
+    id: 'interior-detail', name: 'Interior Detail', icon: '🛋️', dur: '2 hrs',
+    prices: { sedan: 199.99, suv: 219.99, large: 239.99 },
+    items: ['Full vacuum throughout','Steam cleaning','Salt stain removal','Leather conditioning','Vinyl & plastic protection','Carpet shampoo','Floor mat deep clean','Air vent cleaning','Window cleaning (interior)']
+  },
+  {
+    id: 'full-detail', name: 'Full Detail', icon: '✨', dur: '3 hrs', popular: true,
+    prices: { sedan: 279.98, suv: 309.98, large: 339.98 },
+    items: ['Hand wash & dry','Wheel & rim detail','Bug & tar removal','Spray wax & tire shine','Full vacuum throughout','Steam cleaning','Leather conditioning','Carpet shampoo','Salt stain removal','Window cleaning (int + ext)']
+  },
+  {
+    id: 'ceramic-coating', name: 'Ceramic Coating', icon: '🛡️', dur: 'Full Day', premium: true,
+    prices: { sedan: 599.99, suv: 699.99, large: 799.99 },
+    note: 'Full Exterior Detail included in price',
+    warranty: '7+ Year Warranty',
+    items: ['Full Paint Inspection','Exterior Detail (Deep Wash)','Chemical Decontamination','Clay Bar Treatment','Paint Correction','Panel Prep','Ceramic Application','Level & Buff high spots','Cure time 12–24 hours']
+  }
+];
+
+const ADDONS = [
+  { id: 'engine-bay',    name: 'Engine Bay Detail',      icon: '⚙️', price: 79.99  },
+  { id: 'headlight',     name: 'Headlight Restoration',  icon: '💡', price: 119.99 },
+  { id: 'wax-buff',      name: 'Wax & Buff',             icon: '✨', prices: { sedan: 249.99, suv: 299.99, large: 349.99 } },
+  { id: 'undercarriage', name: 'Undercarriage Wash',      icon: '🔩', price: 29.99  },
+  { id: 'seat-restore',  name: 'Seat Restoration',        icon: '🪑', price: 49.99  },
+  { id: 'liquid-wax',    name: 'Liquid Wax Protection',   icon: '💎', prices: { sedan: 54.99, suv: 64.99, large: 74.99 } },
+  { id: 'odour',         name: 'Odour Removal',           icon: '🌿', price: 59.99  },
+  { id: 'interior-polish', name: 'Interior Polishing',   icon: '🪞', prices: { sedan: 59.99, suv: 69.99, large: 79.99 } }
+];
+
+const CERAMIC_ADDONS = [
+  { id: 'ceramic-wheels',  name: 'Wheels',  icon: '🔘', price: 199.99, desc: 'Ceramic coating applied to all 4 wheels · Not Covered By Warranty' },
+  { id: 'ceramic-windows', name: 'Windows', icon: '🪟', price: 199.99, desc: 'Ceramic coating applied to all windows'  }
+];
+
+const ALL_ADDONS = [...ADDONS, ...CERAMIC_ADDONS];
+
+const SZ_LABELS = { sedan: 'Sedan / Coupe', suv: 'Compact SUV', large: 'Large Vehicle' };
+const MONTHS    = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS      = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const TIMES     = ['9:00 AM','10:00 AM','11:00 AM','12:00 PM','1:00 PM','2:00 PM','3:00 PM','4:00 PM','5:00 PM'];
+
+// ══════════════════════════════════════
+// STATE
+// ══════════════════════════════════════
+const S = {
+  step: 1, svcId: null, sz: 'sedan',
+  addons: new Set(), petHair: false, location: '',
+  calY: 0, calM: 0, date: null, time: null,
+  fname: '', lname: '', email: '', phone: '', vehicle: '', notes: '',
+  scrolledToBottom: false
+};
+const PET_HAIR_PRICES = { sedan: 49.99, suv: 59.99, large: 69.99 };
+const PET_HAIR_SVCS   = new Set(['interior-detail', 'full-detail']);
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  const now = new Date();
+  S.calY = now.getFullYear();
+  S.calM = now.getMonth();
+
+  renderDetGrid();
+  renderAddonsGrid();
+  renderCalendar();
+
+  document.querySelectorAll('#vehTabs .veh-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('#vehTabs .veh-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      S.sz = tab.dataset.sz;
+      renderDetGrid();
+      renderAddonsGrid();
+      if (S.svcId) document.getElementById('petHairPriceTag').textContent = `+$${PET_HAIR_PRICES[S.sz].toFixed(2)}`;
+      updatePriceBar();
+    });
+  });
+
+  // Scroll-to-unlock listener for step 1
+  const sp1Content = document.querySelector('#sp1 .sp-content');
+  sp1Content.addEventListener('scroll', () => {
+    if (S.scrolledToBottom) return;
+    const atBottom = sp1Content.scrollTop + sp1Content.clientHeight >= sp1Content.scrollHeight - 24;
+    if (atBottom) {
+      S.scrolledToBottom = true;
+      updateS1Button();
+    }
+  });
+
+  // Init EmailJS if configured
+  if (typeof emailjs !== 'undefined' && EMAILJS_CONFIG.publicKey !== 'YOUR_PUBLIC_KEY') {
+    emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
+  }
+});
+
+// ══════════════════════════════════════
+// OVERLAY OPEN / CLOSE
+// ══════════════════════════════════════
+function openBookingOverlay(id) {
+  S.scrolledToBottom = false;
+  document.querySelector('#sp1 .sp-content').scrollTop = 0;
+  document.getElementById('bkOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if (id) {
+    S.svcId = id;
+    S.sz = 'sedan';
+    S.addons.clear();
+    S.petHair = false;
+    document.querySelectorAll('#vehTabs .veh-tab').forEach(t => t.classList.toggle('active', t.dataset.sz === 'sedan'));
+    renderDetGrid();
+    renderAddonsGrid();
+    updatePriceBar();
+    showAddons();
+    showPetHair();
+    updateS1Button();
+    goStep(1);
+  } else {
+    goStep(1);
+  }
+}
+
+function closeBookingOverlay() {
+  document.getElementById('bkOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeBookingOverlay();
+});
+
+function openBookingFor(id) {
+  openBookingOverlay(id);
+}
+
+// ══════════════════════════════════════
+// STEP NAVIGATION
+// ══════════════════════════════════════
+function goStep(n) {
+  const current = document.getElementById(`sp${S.step}`);
+  if (current) current.classList.remove('active');
+
+  if (n <= 4) {
+    document.querySelectorAll('#bProg .prog-step').forEach(el => {
+      const sn = +el.dataset.s;
+      el.classList.remove('active','done');
+      if (sn === n) el.classList.add('active');
+      if (sn < n)   el.classList.add('done');
+    });
+    [1,2,3].forEach(i => {
+      const pc = document.getElementById(`pc${i}`);
+      if (pc) pc.classList.toggle('lit', i < n);
+    });
+  }
+
+  S.step = n;
+  const next = document.getElementById(`sp${n}`);
+  if (next) {
+    next.classList.add('active');
+    const content = next.querySelector('.sp-content');
+    if (content) content.scrollTop = 0;
+  }
+
+  if (n === 4) fillPaymentSummary();
+}
+
+// ══════════════════════════════════════
+// DETAILING CARD RENDERING
+// ══════════════════════════════════════
+function renderDetGrid() {
+  const cards = SERVICES.map(sv => {
+    const sel = S.svcId === sv.id;
+    if (sv.premium) {
+      return `
+      <div class="det-card-bk det-card-premium${sel ? ' selected' : ''}" onclick="pickSvc('${sv.id}')">
+        <span class="dcb-icon">${sv.icon}</span>
+        <div class="dcb-left">
+          ${!sel ? '<span class="dcb-pop" style="position:static;margin-bottom:0.35rem;display:inline-flex;background:rgba(160,120,32,0.12);border-color:rgba(160,120,32,0.3);color:rgba(180,140,40,0.95);">⭐ Premium</span>' : ''}
+          <div class="dcb-name">${sv.name}</div>
+          <div class="dcb-meta">
+            <span class="dcb-price" style="color:#b08a20;">$${sv.prices[S.sz].toFixed(2)}</span>
+            <span class="dcb-dur">⏱ ${sv.dur}</span>
+          </div>
+          ${sv.note ? `<div style="font-size:0.7rem;font-weight:700;color:rgba(40,175,90,0.85);margin-bottom:0.2rem;">✓ ${sv.note}</div>` : ''}
+          ${sv.warranty ? `<div style="font-size:0.7rem;font-weight:700;color:rgba(160,120,32,0.9);">🛡️ ${sv.warranty}</div>` : ''}
+        </div>
+        <div class="dcb-divider"></div>
+        <ul class="bk-checklist">${sv.items.map(it => `<li>${it}</li>`).join('')}</ul>
+        <div class="dcb-check" style="margin-left:auto;flex-shrink:0;"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>`;
+    }
+    return `
+    <div class="det-card-bk${sel ? ' selected' : ''}" onclick="pickSvc('${sv.id}')">
+      ${sv.popular && !sel ? '<span class="dcb-pop">Popular</span>' : ''}
+      <div class="dcb-check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <span class="dcb-icon">${sv.icon}</span>
+      <div class="dcb-name">${sv.name}</div>
+      <div class="dcb-meta">
+        <span class="dcb-price">$${sv.prices[S.sz].toFixed(2)}</span>
+        <span class="dcb-dur">⏱ ${sv.dur}</span>
+      </div>
+      <div class="dcb-divider"></div>
+      <ul class="bk-checklist">${sv.items.map(it => `<li>${it}</li>`).join('')}</ul>
+    </div>`;
+  }).join('');
+  document.getElementById('detGrid').innerHTML = cards + '<div class="scroll-fade-hint"></div>';
+}
+
+function pickSvc(id) {
+  S.svcId = id;
+  S.addons.clear();
+  S.petHair = false;
+  renderDetGrid();
+  renderAddonsGrid();
+  updatePriceBar();
+  showAddons();
+  showPetHair();
+  updateS1Button();
+}
+
+function updateS1Button() {
+  const sp1Content = document.querySelector('#sp1 .sp-content');
+  const isScrollable = sp1Content.scrollHeight > sp1Content.clientHeight + 24;
+  if (!isScrollable) S.scrolledToBottom = true;
+  const ready = S.svcId && S.scrolledToBottom;
+  document.getElementById('s1next').disabled = !ready;
+  const hint = document.getElementById('s1scrollHint');
+  hint.style.display = (S.svcId && !S.scrolledToBottom) ? 'block' : 'none';
+}
+
+function showPetHair() {
+  const el = document.getElementById('petHairSection');
+  if (!el) return;
+  const show = PET_HAIR_SVCS.has(S.svcId);
+  el.style.display = show ? 'block' : 'none';
+  document.getElementById('petHairToggle').classList.remove('on');
+  document.getElementById('petHairPriceTag').textContent = `+$${PET_HAIR_PRICES[S.sz].toFixed(2)}`;
+}
+
+function togglePetHair() {
+  S.petHair = !S.petHair;
+  document.getElementById('petHairToggle').classList.toggle('on', S.petHair);
+  updatePriceBar();
+}
+
+function showAddons() {
+  const el = document.getElementById('addonsSection');
+  if (el) el.style.display = 'block';
+}
+
+// ══════════════════════════════════════
+// ADD-ONS
+// ══════════════════════════════════════
+function getAddonPrice(a) {
+  return a.prices ? a.prices[S.sz] : a.price;
+}
+
+function renderAddonsGrid() {
+  const isCeramic = S.svcId === 'ceramic-coating';
+  const pool = isCeramic ? CERAMIC_ADDONS : ADDONS;
+  document.querySelector('#addonsSection .bk-section-label').textContent = isCeramic ? 'Ceramic Add-Ons' : 'Add-Ons';
+  document.getElementById('addonsGrid').innerHTML = pool.map(a => {
+    const p = getAddonPrice(a);
+    return `
+    <div class="addon-tog${S.addons.has(a.id) ? ' on' : ''}" onclick="toggleAddon('${a.id}')">
+      <div class="at-check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <span class="at-icon">${a.icon}</span>
+      <div class="at-info">
+        <div class="at-name">${a.name}</div>
+        ${a.desc ? `<div style="font-size:0.65rem;color:var(--muted);line-height:1.3;">${a.desc}</div>` : ''}
+        <div class="at-price">+$${p.toFixed(2)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleAddon(id) {
+  if (S.addons.has(id)) S.addons.delete(id);
+  else S.addons.add(id);
+  renderAddonsGrid();
+  updatePriceBar();
+}
+
+function getAddonsTotal() {
+  let total = 0;
+  S.addons.forEach(id => {
+    const a = ALL_ADDONS.find(x => x.id === id);
+    if (a) total += getAddonPrice(a);
+  });
+  return total;
+}
+
+// ══════════════════════════════════════
+// PRICE BAR
+// ══════════════════════════════════════
+function updatePriceBar() {
+  const sv = SERVICES.find(s => s.id === S.svcId);
+  const priceEl  = document.getElementById('pb-price');
+  const addonsEl = document.getElementById('pb-addons');
+  document.getElementById('pb-sz').textContent = SZ_LABELS[S.sz];
+
+  if (sv) {
+    document.getElementById('pb-svc').textContent = sv.name;
+    const base   = sv.prices[S.sz];
+    const extras = getAddonsTotal() + (S.petHair ? PET_HAIR_PRICES[S.sz] : 0);
+    priceEl.textContent = `$${(base + extras).toFixed(2)}`;
+    priceEl.classList.remove('empty');
+    const extrasCount = S.addons.size + (S.petHair ? 1 : 0);
+    if (extras > 0) {
+      addonsEl.textContent = `${extrasCount} add-on${extrasCount > 1 ? 's' : ''} (+$${extras.toFixed(2)})`;
+      addonsEl.style.display = 'block';
+    } else {
+      addonsEl.style.display = 'none';
+    }
+  } else {
+    document.getElementById('pb-svc').textContent = 'Select a service above';
+    priceEl.textContent = '—';
+    priceEl.classList.add('empty');
+    addonsEl.style.display = 'none';
+  }
+}
+
+// ══════════════════════════════════════
+// CALENDAR
+// ══════════════════════════════════════
+function renderCalendar() {
+  const y = S.calY, m = S.calM;
+  document.getElementById('calTitle').textContent = `${MONTHS[m]} ${y}`;
+
+  const today     = new Date(); today.setHours(0,0,0,0);
+  const firstDay  = new Date(y, m, 1).getDay();
+  const lastDay   = new Date(y, m + 1, 0).getDate();
+  const is370King = S.location === '370 King St. W';
+
+  let html = DAYS.map(d => `<div class="cal-dh">${d}</div>`).join('');
+  for (let i = 0; i < firstDay; i++) html += '<div></div>';
+
+  for (let d = 1; d <= lastDay; d++) {
+    const dt      = new Date(y, m, d);
+    const isPast  = dt < today;
+    const isSun   = dt.getDay() === 0;
+    const isSel   = S.date && S.date.getTime() === dt.getTime();
+    const isToday = dt.getTime() === today.getTime();
+    // Sundays only blocked at 370 King; 10 Lower Jarvis open 7 days
+    const dis     = isPast || (is370King && isSun);
+
+    html += `<button class="cal-day${isSel ? ' selected' : ''}${isToday ? ' today' : ''}"
+      ${dis ? 'disabled' : `onclick="pickDate(new Date(${y},${m},${d}))"`}
+    >${d}</button>`;
+  }
+  document.getElementById('calGrid').innerHTML = html;
+
+  const nowM = new Date(); nowM.setDate(1); nowM.setHours(0,0,0,0);
+  document.getElementById('calPrev').disabled = new Date(y, m, 1) <= nowM;
+}
+
+function shiftMonth(delta) {
+  S.calM += delta;
+  if (S.calM > 11) { S.calM = 0; S.calY++; }
+  if (S.calM < 0)  { S.calM = 11; S.calY--; }
+  renderCalendar();
+}
+
+function pickDate(dt) {
+  S.date = dt;
+  S.time = null;
+  renderCalendar();
+  renderTimes();
+  document.getElementById('timeBlock').style.display = 'block';
+  checkStep2();
+}
+
+function renderTimes() {
+  const d = S.date.getDate();
+  const booked = new Set([(d * 3) % TIMES.length, (d * 7 + 3) % TIMES.length]);
+  document.getElementById('timeGrid').innerHTML = TIMES.map((t, i) => {
+    const bk = booked.has(i);
+    return `<div class="t-slot${bk ? ' booked' : ''}${S.time === t ? ' selected' : ''}"
+      ${bk ? '' : `onclick="pickTime('${t}')"`}>
+      ${t}${bk ? '<span class="booked-lbl">Booked</span>' : ''}
+    </div>`;
+  }).join('');
+}
+
+function pickTime(t) {
+  S.time = t;
+  renderTimes();
+  checkStep2();
+}
+
+function onLocationChange() {
+  S.location = document.getElementById('f-location').value;
+  // If 370 King selected and a Sunday was chosen, clear it
+  if (S.location === '370 King St. W' && S.date && S.date.getDay() === 0) {
+    S.date = null;
+    S.time = null;
+    document.getElementById('timeBlock').style.display = 'none';
+  }
+  const note = document.getElementById('kingnote');
+  if (note) note.style.display = S.location === '370 King St. W' ? 'block' : 'none';
+  renderCalendar();
+  checkStep2();
+}
+
+function checkStep2() {
+  document.getElementById('s2next').disabled = !(S.location && S.date && S.time);
+}
+
+// ══════════════════════════════════════
+// STEP 3 VALIDATION
+// ══════════════════════════════════════
+function validateStep3() {
+  const vals = {
+    fname:   document.getElementById('f-fname').value.trim(),
+    lname:   document.getElementById('f-lname').value.trim(),
+    email:   document.getElementById('f-email').value.trim(),
+    phone:   document.getElementById('f-phone').value.trim(),
+    vehicle: document.getElementById('f-vehicle').value.trim()
+  };
+  if (!vals.fname || !vals.lname || !vals.email || !vals.phone || !vals.vehicle) {
+    alert('Please fill in all required fields.'); return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(vals.email)) {
+    alert('Please enter a valid email address.'); return;
+  }
+  Object.assign(S, vals);
+  S.notes = document.getElementById('f-notes').value.trim();
+  goStep(4);
+}
+
+// ══════════════════════════════════════
+// PAYMENT SUMMARY
+// ══════════════════════════════════════
+function fillPaymentSummary() {
+  const sv    = SERVICES.find(s => s.id === S.svcId);
+  const base  = sv.prices[S.sz];
+  const extra = getAddonsTotal() + (S.petHair ? PET_HAIR_PRICES[S.sz] : 0);
+  const total = base + extra;
+  const dStr  = S.date.toLocaleDateString('en-CA', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+
+  document.getElementById('ov-svc').textContent   = sv.name;
+  document.getElementById('ov-sz').textContent    = SZ_LABELS[S.sz];
+  document.getElementById('ov-loc').textContent   = S.location;
+  document.getElementById('ov-date').textContent  = dStr;
+  document.getElementById('ov-time').textContent  = S.time;
+  document.getElementById('ov-name').textContent  = `${S.fname} ${S.lname}`;
+  document.getElementById('ov-total').textContent = `$${total.toFixed(2)}`;
+  document.getElementById('payAmt').textContent   = `$${total.toFixed(2)}`;
+
+  const addonRowsEl = document.getElementById('ov-addons-rows');
+  let rows = Array.from(S.addons).map(id => {
+    const a = ALL_ADDONS.find(x => x.id === id);
+    return `<div class="order-row"><span class="or-label">+ ${a.name}</span><span class="or-value">$${getAddonPrice(a).toFixed(2)}</span></div>`;
+  });
+  if (S.petHair) rows.push(`<div class="order-row"><span class="or-label">+ Pet Hair Removal</span><span class="or-value">$${PET_HAIR_PRICES[S.sz].toFixed(2)}</span></div>`);
+  addonRowsEl.innerHTML = rows.join('');
+}
+
+// ══════════════════════════════════════
+// CARD FORMATTING
+// ══════════════════════════════════════
+function fmtCard(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,16);
+  el.value = v.replace(/(.{4})/g,'$1 ').trim();
+}
+function fmtExp(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,4);
+  if (v.length >= 3) v = v.slice(0,2) + ' / ' + v.slice(2);
+  el.value = v;
+}
+
+// ══════════════════════════════════════
+// SUBMIT BOOKING
+// ══════════════════════════════════════
+function submitBooking() {
+  const ccName = document.getElementById('cc-name').value.trim();
+  const ccNum  = document.getElementById('cc-num').value.replace(/\s/g,'');
+  const ccExp  = document.getElementById('cc-exp').value.trim();
+  const ccCvv  = document.getElementById('cc-cvv').value.trim();
+
+  if (!ccName || ccNum.length < 16 || ccExp.length < 7 || ccCvv.length < 3) {
+    alert('Please complete all payment fields.'); return;
+  }
+
+  const btn = document.getElementById('payBtn');
+  btn.textContent = 'Processing…';
+  btn.disabled = true;
+
+  setTimeout(() => {
+    const sv    = SERVICES.find(s => s.id === S.svcId);
+    const total = sv.prices[S.sz] + getAddonsTotal() + (S.petHair ? PET_HAIR_PRICES[S.sz] : 0);
+    const dStr  = S.date.toLocaleDateString('en-CA', { weekday: 'short', month: 'short', day: 'numeric' });
+    const extrasCount = S.addons.size + (S.petHair ? 1 : 0);
+    let svcLabel = sv.name;
+    if (extrasCount > 0) svcLabel += ` + ${extrasCount} add-on${extrasCount > 1 ? 's' : ''}`;
+
+    document.getElementById('cf-svc').textContent = svcLabel;
+    document.getElementById('cf-loc').textContent = S.location;
+    document.getElementById('cf-dt').textContent  = `${dStr} at ${S.time}`;
+    document.getElementById('cf-veh').textContent = S.vehicle;
+    document.getElementById('cf-amt').textContent = `$${total.toFixed(2)}`;
+
+    document.querySelectorAll('#bProg .prog-step').forEach(el => { el.classList.remove('active'); el.classList.add('done'); });
+    document.querySelectorAll('#bProg .prog-connector').forEach(el => el.classList.add('lit'));
+
+    saveBookingToStorage(sv, total, svcLabel);
+    sendConfirmationEmails(sv, total, svcLabel);
+
+    goStep(5);
+    btn.textContent = 'Confirm Booking & Pay';
+    btn.disabled = false;
+  }, 1800);
+}
+
+// ══════════════════════════════════════
+// SAVE TO LOCALSTORAGE (admin calendar)
+// ══════════════════════════════════════
+function saveBookingToStorage(sv, total, svcLabel) {
+  const bookings = JSON.parse(localStorage.getItem('mrshine_bookings') || '[]');
+  bookings.push({
+    id: Date.now(),
+    svcId: S.svcId, svcName: sv.name, svcLabel,
+    sz: S.sz, addons: Array.from(S.addons),
+    location: S.location,
+    date: S.date.toISOString(),
+    time: S.time,
+    fname: S.fname, lname: S.lname,
+    email: S.email, phone: S.phone,
+    vehicle: S.vehicle, notes: S.notes,
+    total,
+    createdAt: new Date().toISOString()
+  });
+  localStorage.setItem('mrshine_bookings', JSON.stringify(bookings));
+}
+
+// ══════════════════════════════════════
+// EMAIL CONFIRMATION (EmailJS)
+// ══════════════════════════════════════
+function sendConfirmationEmails(sv, total, svcLabel) {
+  if (typeof emailjs === 'undefined' || EMAILJS_CONFIG.publicKey === 'YOUR_PUBLIC_KEY') return;
+
+  const dateStr  = S.date.toLocaleDateString('en-CA', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  const addonsStr = S.addons.size > 0
+    ? Array.from(S.addons).map(id => ADDONS.find(x => x.id === id)?.name).filter(Boolean).join(', ')
+    : 'None';
+
+  const params = {
+    customer_name:  `${S.fname} ${S.lname}`,
+    customer_email: S.email,
+    customer_phone: S.phone,
+    service:        svcLabel,
+    vehicle:        S.vehicle,
+    vehicle_size:   SZ_LABELS[S.sz],
+    add_ons:        addonsStr,
+    location:       S.location,
+    date:           dateStr,
+    time:           S.time,
+    total:          `$${total.toFixed(2)}`,
+    notes:          S.notes || 'None'
+  };
+
+  // To business
+  emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.bizTemplateId, { ...params, to_email: 'mrshinetoronto@gmail.com' }).catch(console.error);
+  // To customer
+  emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.custTemplateId, { ...params, to_email: S.email }).catch(console.error);
+}
+</script>
+</body>
+</html>
