@@ -63,7 +63,10 @@ module.exports = async (req, res) => {
   }
 
   const amountCents = Math.round(total * 100);
-  const BASE_URL = 'https://www.mrshinetoronto.com';
+  const origin   = req.headers.origin || `https://${req.headers.host}`;
+  const BASE_URL = (origin.includes('localhost') || origin.includes('127.0.0.1'))
+    ? origin
+    : 'https://www.mrshinetoronto.com';
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],

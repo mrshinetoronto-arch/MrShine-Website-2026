@@ -150,7 +150,7 @@ const ADDON_NAMES = {
 
 function show(id) {
   ['stateLoading', 'stateError', 'stateSuccess'].forEach(s => {
-    document.getElementById(s).style.display = s === id ? '' : 'none';
+    document.getElementById(s).style.display = s === id ? 'block' : 'none';
   });
 }
 
