@@ -63,7 +63,7 @@ module.exports = async (req, res) => {
   }
 
   const amountCents = Math.round(total * 100);
-  const origin = req.headers.origin || `https://${req.headers.host}`;
+  const BASE_URL = 'https://www.mrshinetoronto.com';
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
@@ -79,8 +79,8 @@ module.exports = async (req, res) => {
       quantity: 1,
     }],
     mode: 'payment',
-    success_url: `${origin}/success.html?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url:  `${origin}/`,
+    success_url: `${BASE_URL}/success.html?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url:  `${BASE_URL}/`,
     customer_email: email || undefined,
     metadata: {
       svcId,

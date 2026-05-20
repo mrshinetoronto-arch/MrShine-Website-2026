@@ -23,15 +23,20 @@ function formatDate(iso) {
   });
 }
 
+async function getRawBody(req) {
+  const chunks = [];
+  for await (const chunk of req) {
+    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
+  }
+  return Buffer.concat(chunks);
+}
+
 async function sendEmails(m, amountTotal) {
   if (!process.env.GMAIL_PASS) return;
 
   const transporter = nodemailer.createTransport({
     service: 'gmail',
-    auth: {
-      user: 'mrshinetoronto@gmail.com',
-      pass: process.env.GMAIL_PASS,
-    },
+    auth: { user: 'mrshinetoronto@gmail.com', pass: process.env.GMAIL_PASS },
   });
 
   const addons   = m.addons ? m.addons.split(',').filter(Boolean) : [];
@@ -56,7 +61,7 @@ async function sendEmails(m, amountTotal) {
       </tr>
     </table>`;
 
-  // ── Email to business ──
+  // Email to business
   await transporter.sendMail({
     from:    '"MrShine Bookings" <mrshinetoronto@gmail.com>',
     to:      'mrshinetoronto@gmail.com',
@@ -71,7 +76,7 @@ async function sendEmails(m, amountTotal) {
       </div>`,
   });
 
-  // ── Confirmation email to customer ──
+  // Confirmation email to customer
   if (m.email) {
     await transporter.sendMail({
       from:    '"MrShine Car Detailing" <mrshinetoronto@gmail.com>',
@@ -90,26 +95,31 @@ async function sendEmails(m, amountTotal) {
 }
 
 module.exports = async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method !== 'POST') return res.status(405).end();
 
-  const { session_id } = req.query;
-  if (!session_id) return res.status(400).json({ error: 'Missing session_id' });
+  const stripe        = new Stripe(process.env.STRIPE_SECRET_KEY);
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  const sig           = req.headers['stripe-signature'];
 
+  let event;
   try {
-    const stripe  = new Stripe(process.env.STRIPE_SECRET_KEY);
-    const session = await stripe.checkout.sessions.retrieve(session_id);
-
-    if (session.payment_status !== 'paid') {
-      return res.status(402).json({ error: 'Payment not completed' });
-    }
-
-    res.status(200).json({
-      metadata:    session.metadata,
-      amountTotal: session.amount_total,
-    });
+    const rawBody = await getRawBody(req);
+    event = webhookSecret
+      ? stripe.webhooks.constructEvent(rawBody, sig, webhookSecret)
+      : JSON.parse(rawBody.toString());
   } catch (err) {
-    console.error('get-session error:', err.message);
-    res.status(500).json({ error: err.message });
+    console.error('Webhook error:', err.message);
+    return res.status(400).json({ error: err.message });
   }
+
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+    if (session.payment_status === 'paid') {
+      await sendEmails(session.metadata, session.amount_total).catch(err =>
+        console.error('Email error:', err.message)
+      );
+    }
+  }
+
+  res.status(200).json({ received: true });
 };
