@@ -104,6 +104,11 @@ module.exports = async (req, res) => {
       return res.status(402).json({ error: 'Payment not completed' });
     }
 
+    // Send emails non-blocking — don't fail the response if email fails
+    sendEmails(session.metadata, session.amount_total).catch(err =>
+      console.error('Email error:', err.message)
+    );
+
     res.status(200).json({
       metadata:    session.metadata,
       amountTotal: session.amount_total,
