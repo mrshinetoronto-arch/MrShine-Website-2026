@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking Confirmed — MrShine</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:      #090909;
+      --card:    #111113;
+      --border:  rgba(192,200,212,0.07);
+      --red:     #cc0000;
+      --chrome:  #c0c8d4;
+      --muted:   #6b7280;
+      --white:   #f0f0f6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+    body { background: var(--bg); color: var(--white); font-family: 'Inter', sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+    h1, h2, h3 { font-family: 'Playfair Display', serif; }
+
+    .noise { position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 250px; }
+    .glow { position: fixed; top: -200px; left: 50%; transform: translateX(-50%); width: 700px; height: 400px; pointer-events: none; background: radial-gradient(ellipse, rgba(204,0,0,0.09) 0%, transparent 65%); z-index: 0; }
+
+    .card {
+      position: relative; z-index: 1;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 3rem 2.5rem;
+      max-width: 520px; width: 100%;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03) inset;
+    }
+
+    /* loading */
+    .loading { text-align: center; padding: 2rem 0; }
+    .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.08); border-top-color: var(--red); border-radius: 50%; animation: spin 0.9s linear infinite; margin: 0 auto 1.25rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading p { color: var(--muted); font-size: 0.88rem; }
+
+    /* error */
+    .error-state { text-align: center; }
+    .error-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .error-state h2 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .error-state p { color: var(--muted); font-size: 0.88rem; line-height: 1.7; }
+
+    /* success */
+    .success-state { display: none; }
+    .check-ring {
+      width: 72px; height: 72px; border-radius: 50%;
+      border: 2px solid rgba(204,0,0,0.3);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.75rem;
+      background: radial-gradient(circle at center, rgba(204,0,0,0.08) 0%, transparent 70%);
+      box-shadow: 0 0 32px rgba(204,0,0,0.2);
+    }
+    .check-ring svg { color: var(--red); }
+    .success-state h1 { font-size: 2rem; text-align: center; margin-bottom: 0.5rem; letter-spacing: -0.02em; }
+    .success-state > p { text-align: center; color: var(--muted); font-size: 0.9rem; line-height: 1.72; margin-bottom: 2rem; }
+
+    .conf-box {
+      background: rgba(255,255,255,0.025); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.25rem 1.4rem; margin-bottom: 1.5rem;
+    }
+    .conf-box h3 { font-family: 'Inter', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+    .conf-row { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding: 0.45rem 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .conf-row:last-child { border-bottom: none; }
+    .conf-label { font-size: 0.78rem; color: var(--muted); white-space: nowrap; }
+    .conf-val { font-size: 0.84rem; font-weight: 500; color: var(--white); text-align: right; }
+    .conf-total { display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(204,0,0,0.18); }
+    .conf-total-label { font-size: 0.82rem; color: var(--muted); }
+    .conf-total-val { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; color: var(--red); }
+
+    .email-note { font-size: 0.78rem; color: var(--muted); text-align: center; margin-bottom: 1.75rem; line-height: 1.65; }
+    .email-note strong { color: var(--chrome); }
+
+    .back-btn {
+      display: block; width: 100%; padding: 0.85rem 2rem; text-align: center;
+      background: transparent; border: 1.5px solid rgba(192,200,212,0.18);
+      border-radius: 8px; color: var(--chrome); font-size: 0.8rem; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer;
+      text-decoration: none; transition: border-color 0.2s, color 0.2s, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .back-btn:hover { border-color: rgba(192,200,212,0.5); color: var(--white); transform: translateY(-2px); }
+  </style>
+</head>
+<body>
+<div class="noise"></div>
+<div class="glow"></div>
+
+<div class="card" id="card">
+
+  <!-- Loading -->
+  <div class="loading" id="stateLoading">
+    <div class="spinner"></div>
+    <p>Verifying your payment…</p>
+  </div>
+
+  <!-- Error -->
+  <div class="error-state" id="stateError" style="display:none;">
+    <div class="error-icon">⚠️</div>
+    <h2>Something went wrong</h2>
+    <p id="errMsg" style="margin-top:0.5rem;"></p>
+    <a href="/" class="back-btn" style="display:inline-block;margin-top:2rem;width:auto;padding:0.75rem 2rem;">← Back to site</a>
+  </div>
+
+  <!-- Success -->
+  <div class="success-state" id="stateSuccess">
+    <div class="check-ring">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <h1>You're booked!</h1>
+    <p>Your booking is confirmed and payment received. A confirmation email is on its way.</p>
+
+    <div class="conf-box">
+      <h3>Booking Details</h3>
+      <div class="conf-row"><span class="conf-label">Service</span><span class="conf-val" id="cs-svc">—</span></div>
+      <div class="conf-row"><span class="conf-label">Vehicle</span><span class="conf-val" id="cs-veh">—</span></div>
+      <div class="conf-row"><span class="conf-label">Location</span><span class="conf-val" id="cs-loc">—</span></div>
+      <div class="conf-row"><span class="conf-label">Date &amp; Time</span><span class="conf-val" id="cs-dt">—</span></div>
+      <div class="conf-row"><span class="conf-label">Name</span><span class="conf-val" id="cs-name">—</span></div>
+      <div class="conf-total">
+        <span class="conf-total-label">Paid</span>
+        <span class="conf-total-val" id="cs-amt">—</span>
+      </div>
+    </div>
+
+    <p class="email-note">Keep this page or your email as your receipt.<br>Questions? <strong>mrshinetoronto@gmail.com</strong></p>
+
+    <a href="/" class="back-btn">← Back to site</a>
+  </div>
+
+</div>
+
+<script>
+const SZ_LABELS = { sedan: 'Sedan / Coupe', suv: 'Compact SUV', large: 'Large Vehicle' };
+
+const ADDON_NAMES = {
+  'engine-bay':       'Engine Bay Detail',
+  'headlight':        'Headlight Restoration',
+  'wax-buff':         'Wax & Buff',
+  'undercarriage':    'Undercarriage Wash',
+  'seat-restore':     'Seat Restoration',
+  'liquid-wax':       'Liquid Wax Protection',
+  'odour':            'Odour Removal',
+  'interior-polish':  'Interior Polishing',
+  'ceramic-wheels':   'Ceramic Wheels',
+  'ceramic-windows':  'Ceramic Windows',
+};
+
+function show(id) {
+  ['stateLoading', 'stateError', 'stateSuccess'].forEach(s => {
+    document.getElementById(s).style.display = s === id ? '' : 'none';
+  });
+}
+
+function showError(msg) {
+  document.getElementById('errMsg').textContent = msg;
+  show('stateError');
+}
+
+function formatDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-CA', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+}
+
+function saveBookingToStorage(m, amountTotal) {
+  try {
+    const bookings = JSON.parse(localStorage.getItem('mrshine_bookings') || '[]');
+    const addons = m.addons ? m.addons.split(',').filter(Boolean) : [];
+    let svcLabel = m.svcName;
+    const extrasCount = addons.length + (m.petHair === 'true' ? 1 : 0);
+    if (extrasCount > 0) svcLabel += ` + ${extrasCount} add-on${extrasCount > 1 ? 's' : ''}`;
+    bookings.push({
+      id:        Date.now(),
+      svcId:     m.svcId,
+      svcName:   m.svcName,
+      svcLabel,
+      sz:        m.sz,
+      addons,
+      location:  m.location,
+      date:      m.date,
+      time:      m.time,
+      fname:     m.fname,
+      lname:     m.lname,
+      email:     m.email,
+      phone:     m.phone,
+      vehicle:   m.vehicle,
+      notes:     m.notes,
+      total:     amountTotal / 100,
+      createdAt: new Date().toISOString(),
+    });
+    localStorage.setItem('mrshine_bookings', JSON.stringify(bookings));
+  } catch (_) {}
+}
+
+async function init() {
+  const params    = new URLSearchParams(window.location.search);
+  const sessionId = params.get('session_id');
+  if (!sessionId) return showError('No session found. If you completed a payment, please contact us.');
+
+  try {
+    const res  = await fetch(`/api/get-session?session_id=${encodeURIComponent(sessionId)}`);
+    const data = await res.json();
+    if (!res.ok) return showError(data.error || 'Could not verify payment. Please contact us.');
+
+    const m = data.metadata;
+    const addons = m.addons ? m.addons.split(',').filter(Boolean) : [];
+    const addonStr = addons.map(id => ADDON_NAMES[id] || id).join(', ');
+
+    document.getElementById('cs-svc').textContent  = addonStr ? `${m.svcName} + ${addonStr}` : m.svcName;
+    document.getElementById('cs-veh').textContent  = [SZ_LABELS[m.sz], m.vehicle].filter(Boolean).join(' · ');
+    document.getElementById('cs-loc').textContent  = m.location || '—';
+    document.getElementById('cs-dt').textContent   = `${formatDate(m.date)} at ${m.time}`;
+    document.getElementById('cs-name').textContent = `${m.fname} ${m.lname}`.trim();
+    document.getElementById('cs-amt').textContent  = `$${(data.amountTotal / 100).toFixed(2)}`;
+
+    saveBookingToStorage(m, data.amountTotal);
+    show('stateSuccess');
+  } catch (err) {
+    showError('Network error. Please contact us to confirm your booking.');
+  }
+}
+
+init();
+</script>
+</body>
+</html>

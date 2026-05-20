@@ -973,28 +973,13 @@
             </div>
           </div>
 
-          <div class="form-field">
-            <label class="form-label" for="cc-name">Cardholder Name</label>
-            <input class="form-input" id="cc-name" type="text" placeholder="Jane Smith" autocomplete="cc-name">
-          </div>
-          <div class="form-field">
-            <label class="form-label" for="cc-num">Card Number</label>
-            <input class="form-input" id="cc-num" type="text" placeholder="1234 5678 9012 3456" maxlength="19" autocomplete="cc-number" oninput="fmtCard(this)">
-          </div>
-          <div class="card-row">
-            <div class="form-field">
-              <label class="form-label" for="cc-exp">Expiry</label>
-              <input class="form-input" id="cc-exp" type="text" placeholder="MM / YY" maxlength="7" autocomplete="cc-exp" oninput="fmtExp(this)">
-            </div>
-            <div class="form-field">
-              <label class="form-label" for="cc-cvv">CVV</label>
-              <input class="form-input" id="cc-cvv" type="text" placeholder="123" maxlength="4" autocomplete="cc-csc">
-            </div>
-          </div>
-
-          <div class="secure-note">
+          <div class="secure-note" style="margin-bottom:1.25rem;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            Your payment is encrypted and secure. Card details are never stored.
+            You'll be redirected to Stripe's secure checkout. Your card details are handled by Stripe — never stored on our servers.
+          </div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:0.5rem;margin-bottom:1rem;opacity:0.45;font-size:0.7rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);">
+            <svg width="38" height="16" viewBox="0 0 38 16" fill="none"><text x="0" y="13" font-family="sans-serif" font-size="13" font-weight="700" fill="#635bff">stripe</text></svg>
+            <span>·</span><span>Visa</span><span>·</span><span>Mastercard</span><span>·</span><span>Amex</span>
           </div>
         </div>
         <div class="sp-footer">
@@ -1518,60 +1503,47 @@ function fillPaymentSummary() {
   addonRowsEl.innerHTML = rows.join('');
 }
 
-// ══════════════════════════════════════
-// CARD FORMATTING
-// ══════════════════════════════════════
-function fmtCard(el) {
-  let v = el.value.replace(/\D/g,'').slice(0,16);
-  el.value = v.replace(/(.{4})/g,'$1 ').trim();
-}
-function fmtExp(el) {
-  let v = el.value.replace(/\D/g,'').slice(0,4);
-  if (v.length >= 3) v = v.slice(0,2) + ' / ' + v.slice(2);
-  el.value = v;
-}
 
 // ══════════════════════════════════════
-// SUBMIT BOOKING
+// SUBMIT BOOKING — Stripe Checkout
 // ══════════════════════════════════════
-function submitBooking() {
-  const ccName = document.getElementById('cc-name').value.trim();
-  const ccNum  = document.getElementById('cc-num').value.replace(/\s/g,'');
-  const ccExp  = document.getElementById('cc-exp').value.trim();
-  const ccCvv  = document.getElementById('cc-cvv').value.trim();
-
-  if (!ccName || ccNum.length < 16 || ccExp.length < 7 || ccCvv.length < 3) {
-    alert('Please complete all payment fields.'); return;
-  }
-
+async function submitBooking() {
   const btn = document.getElementById('payBtn');
-  btn.textContent = 'Processing…';
+  btn.textContent = 'Redirecting to checkout…';
   btn.disabled = true;
 
-  setTimeout(() => {
-    const sv    = SERVICES.find(s => s.id === S.svcId);
-    const total = sv.prices[S.sz] + getAddonsTotal() + (S.petHair ? PET_HAIR_PRICES[S.sz] : 0);
-    const dStr  = S.date.toLocaleDateString('en-CA', { weekday: 'short', month: 'short', day: 'numeric' });
-    const extrasCount = S.addons.size + (S.petHair ? 1 : 0);
-    let svcLabel = sv.name;
-    if (extrasCount > 0) svcLabel += ` + ${extrasCount} add-on${extrasCount > 1 ? 's' : ''}`;
+  try {
+    const res = await fetch('/api/create-checkout-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        svcId:    S.svcId,
+        sz:       S.sz,
+        addons:   Array.from(S.addons),
+        petHair:  S.petHair,
+        fname:    S.fname,
+        lname:    S.lname,
+        email:    S.email,
+        phone:    S.phone,
+        date:     S.date ? S.date.toISOString() : '',
+        time:     S.time,
+        location: S.location,
+        vehicle:  S.vehicle,
+        notes:    S.notes,
+      }),
+    });
 
-    document.getElementById('cf-svc').textContent = svcLabel;
-    document.getElementById('cf-loc').textContent = S.location;
-    document.getElementById('cf-dt').textContent  = `${dStr} at ${S.time}`;
-    document.getElementById('cf-veh').textContent = S.vehicle;
-    document.getElementById('cf-amt').textContent = `$${total.toFixed(2)}`;
-
-    document.querySelectorAll('#bProg .prog-step').forEach(el => { el.classList.remove('active'); el.classList.add('done'); });
-    document.querySelectorAll('#bProg .prog-connector').forEach(el => el.classList.add('lit'));
-
-    saveBookingToStorage(sv, total, svcLabel);
-    sendConfirmationEmails(sv, total, svcLabel);
-
-    goStep(5);
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      throw new Error(data.error || 'Could not start checkout');
+    }
+  } catch (err) {
+    alert('Payment error: ' + err.message + '\nPlease try again or contact us.');
     btn.textContent = 'Confirm Booking & Pay';
     btn.disabled = false;
-  }, 1800);
+  }
 }
 
 // ══════════════════════════════════════
