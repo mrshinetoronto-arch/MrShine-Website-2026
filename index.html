@@ -848,7 +848,7 @@
             <div class="pb-right">
               <div class="pb-price empty" id="pb-price">—</div>
               <div class="pb-addons" id="pb-addons" style="display:none;"></div>
-              <div class="pb-note">All taxes included</div>
+              <div class="pb-note">Incl. 13% HST</div>
             </div>
           </div>
           <div id="s1scrollHint" style="text-align:center;font-size:0.7rem;color:rgba(204,0,0,0.65);letter-spacing:0.06em;margin-bottom:0.55rem;display:none;">↓ Scroll through all options to continue</div>
@@ -967,6 +967,12 @@
             <div class="order-row"><span class="or-label">Date</span><span class="or-value" id="ov-date">—</span></div>
             <div class="order-row"><span class="or-label">Time</span><span class="or-value" id="ov-time">—</span></div>
             <div class="order-row"><span class="or-label">Name</span><span class="or-value" id="ov-name">—</span></div>
+            <div class="order-row" style="border-top:1px solid rgba(255,255,255,0.07);margin-top:0.5rem;padding-top:0.5rem;">
+              <span class="or-label">Subtotal</span><span class="or-value" id="ov-subtotal">—</span>
+            </div>
+            <div class="order-row">
+              <span class="or-label">HST (13%)</span><span class="or-value" id="ov-hst">—</span>
+            </div>
             <div class="order-total">
               <span class="ot-label">Total Due Today</span>
               <span class="ot-price" id="ov-total">—</span>
@@ -1348,9 +1354,10 @@ function updatePriceBar() {
 
   if (sv) {
     document.getElementById('pb-svc').textContent = sv.name;
-    const base   = sv.prices[S.sz];
-    const extras = getAddonsTotal() + (S.petHair ? PET_HAIR_PRICES[S.sz] : 0);
-    priceEl.textContent = `$${(base + extras).toFixed(2)}`;
+    const base     = sv.prices[S.sz];
+    const extras   = getAddonsTotal() + (S.petHair ? PET_HAIR_PRICES[S.sz] : 0);
+    const subtotal = base + extras;
+    priceEl.textContent = `$${(subtotal * (1 + HST_RATE)).toFixed(2)}`;
     priceEl.classList.remove('empty');
     const extrasCount = S.addons.size + (S.petHair ? 1 : 0);
     if (extras > 0) {
@@ -1478,21 +1485,27 @@ function validateStep3() {
 // ══════════════════════════════════════
 // PAYMENT SUMMARY
 // ══════════════════════════════════════
-function fillPaymentSummary() {
-  const sv    = SERVICES.find(s => s.id === S.svcId);
-  const base  = sv.prices[S.sz];
-  const extra = getAddonsTotal() + (S.petHair ? PET_HAIR_PRICES[S.sz] : 0);
-  const total = base + extra;
-  const dStr  = S.date.toLocaleDateString('en-CA', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+const HST_RATE = 0.13;
 
-  document.getElementById('ov-svc').textContent   = sv.name;
-  document.getElementById('ov-sz').textContent    = SZ_LABELS[S.sz];
-  document.getElementById('ov-loc').textContent   = S.location;
-  document.getElementById('ov-date').textContent  = dStr;
-  document.getElementById('ov-time').textContent  = S.time;
-  document.getElementById('ov-name').textContent  = `${S.fname} ${S.lname}`;
-  document.getElementById('ov-total').textContent = `$${total.toFixed(2)}`;
-  document.getElementById('payAmt').textContent   = `$${total.toFixed(2)}`;
+function fillPaymentSummary() {
+  const sv       = SERVICES.find(s => s.id === S.svcId);
+  const base     = sv.prices[S.sz];
+  const extra    = getAddonsTotal() + (S.petHair ? PET_HAIR_PRICES[S.sz] : 0);
+  const subtotal = base + extra;
+  const hst      = subtotal * HST_RATE;
+  const total    = subtotal + hst;
+  const dStr     = S.date.toLocaleDateString('en-CA', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+
+  document.getElementById('ov-svc').textContent      = sv.name;
+  document.getElementById('ov-sz').textContent       = SZ_LABELS[S.sz];
+  document.getElementById('ov-loc').textContent      = S.location;
+  document.getElementById('ov-date').textContent     = dStr;
+  document.getElementById('ov-time').textContent     = S.time;
+  document.getElementById('ov-name').textContent     = `${S.fname} ${S.lname}`;
+  document.getElementById('ov-subtotal').textContent = `$${subtotal.toFixed(2)}`;
+  document.getElementById('ov-hst').textContent      = `$${hst.toFixed(2)}`;
+  document.getElementById('ov-total').textContent    = `$${total.toFixed(2)}`;
+  document.getElementById('payAmt').textContent      = `$${total.toFixed(2)}`;
 
   const addonRowsEl = document.getElementById('ov-addons-rows');
   let rows = Array.from(S.addons).map(id => {

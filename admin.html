@@ -127,7 +127,9 @@
   </div>
   <div style="display:flex;align-items:center;gap:1rem;">
     <span id="totalCount" style="font-size:0.78rem;color:var(--muted);"></span>
-    <button class="clear-btn" onclick="clearAllBookings()">Clear all data</button>
+    <span id="syncStatus" style="font-size:0.72rem;color:var(--muted);"></span>
+    <button class="today-btn" id="refreshBtn" onclick="refreshBookings()">↺ Refresh</button>
+    <button class="clear-btn" onclick="clearAllBookings()">Clear local data</button>
     <a href="index.html" style="font-size:0.76rem;color:var(--muted);text-decoration:none;padding:0.4rem 0.9rem;border:1px solid var(--border);border-radius:6px;transition:color 0.2s;" onmouseover="this.style.color='#f0f0f6'" onmouseout="this.style.color='var(--muted)'">← Site</a>
   </div>
 </div>
@@ -168,19 +170,67 @@ const MONTHS = ['January','February','March','April','May','June','July','August
 const DAYS_FULL = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const DAYS_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
+const ADDON_LABELS = {
+  'engine-bay':'Engine Bay','headlight':'Headlights','wax-buff':'Wax & Buff',
+  'undercarriage':'Undercarriage','seat-restore':'Seats','liquid-wax':'Liquid Wax',
+  'odour':'Odour','interior-polish':'Interior Polish',
+  'ceramic-wheels':'Ceramic Wheels','ceramic-windows':'Ceramic Windows',
+};
+
 let state = { year: 0, month: 0, selectedDate: null };
+let allBookings = []; // in-memory cache, populated from API + localStorage
 
 function getBookings() {
-  return JSON.parse(localStorage.getItem('mrshine_bookings') || '[]');
+  return allBookings;
 }
 
-function init() {
+async function loadBookings() {
+  const statusEl = document.getElementById('syncStatus');
+  statusEl.textContent = 'Syncing…';
+
+  // Always load localStorage as base
+  const local = JSON.parse(localStorage.getItem('mrshine_bookings') || '[]');
+  const localById = new Map(local.map(b => [b.id, b]));
+
+  try {
+    const res  = await fetch('/api/bookings');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const { bookings: apiBookings } = await res.json();
+
+    // Merge: API data takes precedence; local entries not in API are kept
+    const apiById = new Map(apiBookings.map(b => [b.id, b]));
+    const merged  = [...apiBookings];
+    local.forEach(b => { if (!apiById.has(b.id)) merged.push(b); });
+
+    allBookings = merged;
+    statusEl.textContent = `Synced · ${apiBookings.length} booking${apiBookings.length !== 1 ? 's' : ''} from Stripe`;
+  } catch (err) {
+    // Fall back to localStorage only
+    allBookings = local;
+    statusEl.textContent = `Offline — showing ${local.length} local booking${local.length !== 1 ? 's' : ''}`;
+    console.warn('API load failed, using localStorage:', err.message);
+  }
+
+  renderCalendar();
+  updateStats();
+  if (state.selectedDate) renderDetail(state.selectedDate);
+}
+
+async function refreshBookings() {
+  const btn = document.getElementById('refreshBtn');
+  btn.disabled = true;
+  btn.textContent = '↺ Syncing…';
+  await loadBookings();
+  btn.disabled = false;
+  btn.textContent = '↺ Refresh';
+}
+
+async function init() {
   const now = new Date();
   state.year  = now.getFullYear();
   state.month = now.getMonth();
   renderDayHeaders();
-  renderCalendar();
-  updateStats();
+  await loadBookings();
 }
 
 function renderDayHeaders() {
@@ -308,11 +358,11 @@ function renderDetail(dt) {
     </div>`;
 
   dayBookings.forEach(b => {
-    const addonNames = (b.addons || []).map(id => {
-      const names = { 'engine-bay':'Engine Bay','headlight':'Headlights','wax-buff':'Wax & Buff','undercarriage':'Undercarriage','seat-restore':'Seats','liquid-wax':'Liquid Wax','odour':'Odour' };
-      return names[id] || id;
-    });
-    const loc = (b.location || '').replace(' — ', '\n');
+    const addonNames = (b.addonNames || (b.addons || []).map(id => ADDON_LABELS[id] || id));
+    const szLabel = ({ sedan:'Sedan / Coupe', suv:'Compact SUV', large:'Large Vehicle' }[b.sz]) || b.sz || '—';
+    const total    = b.total    || 0;
+    const subtotal = b.subtotal || Math.round(total / 1.13 * 100) / 100;
+    const hst      = b.hst      || Math.round((total - subtotal) * 100) / 100;
     html += `
       <div class="detail-booking">
         <div class="db-time">${b.time || '—'}</div>
@@ -320,16 +370,25 @@ function renderDetail(dt) {
         <div class="db-svc">${b.svcLabel || b.svcName || '—'}</div>
         <div class="db-meta">
           <div class="db-meta-item"><span class="db-meta-label">Vehicle</span><span class="db-meta-val">${b.vehicle || '—'}</span></div>
-          <div class="db-meta-item"><span class="db-meta-label">Size</span><span class="db-meta-val">${({ sedan:'Sedan', suv:'Compact SUV', large:'Large' }[b.sz]) || b.sz}</span></div>
+          <div class="db-meta-item"><span class="db-meta-label">Size</span><span class="db-meta-val">${szLabel}</span></div>
           <div class="db-meta-item"><span class="db-meta-label">Phone</span><span class="db-meta-val">${b.phone || '—'}</span></div>
           <div class="db-meta-item"><span class="db-meta-label">Email</span><span class="db-meta-val" style="font-size:0.68rem;">${b.email || '—'}</span></div>
           <div class="db-meta-item" style="grid-column:1/-1;"><span class="db-meta-label">Location</span><span class="db-meta-val">${b.location || '—'}</span></div>
           ${addonNames.length ? `<div class="db-meta-item" style="grid-column:1/-1;"><span class="db-meta-label">Add-ons</span><span class="db-meta-val">${addonNames.join(', ')}</span></div>` : ''}
+          ${b.petHair ? `<div class="db-meta-item" style="grid-column:1/-1;"><span class="db-meta-label">Pet Hair</span><span class="db-meta-val">Yes</span></div>` : ''}
         </div>
         ${b.notes ? `<div class="db-notes">📝 ${b.notes}</div>` : ''}
-        <div class="db-total">
-          <span class="db-total-label">Total Paid</span>
-          <span class="db-total-val">$${(b.total || 0).toFixed(2)}</span>
+        <div class="db-total" style="flex-direction:column;align-items:stretch;gap:0.25rem;">
+          <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:var(--muted);">
+            <span>Subtotal</span><span>$${subtotal.toFixed(2)}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:var(--muted);">
+            <span>HST (13%)</span><span>$${hst.toFixed(2)}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding-top:0.35rem;border-top:1px solid rgba(204,0,0,0.25);">
+            <span class="db-total-label">Total Paid</span>
+            <span class="db-total-val">$${total.toFixed(2)}</span>
+          </div>
         </div>
       </div>`;
   });

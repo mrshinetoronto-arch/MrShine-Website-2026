@@ -1,5 +1,7 @@
 const Stripe = require('stripe');
 
+const HST_RATE = 0.13;
+
 const SERVICES = [
   { id: 'exterior-detail', name: 'Exterior Detail',  prices: { sedan: 79.99,  suv: 89.99,  large: 99.99  } },
   { id: 'interior-detail', name: 'Interior Detail',  prices: { sedan: 199.99, suv: 219.99, large: 239.99 } },
@@ -62,7 +64,10 @@ module.exports = async (req, res) => {
     total += PET_HAIR_PRICES[sz];
   }
 
-  const amountCents = Math.round(total * 100);
+  const subtotal    = total;
+  const hst         = Math.round(subtotal * HST_RATE * 100) / 100;
+  const totalWithHst = subtotal + hst;
+  const amountCents = Math.round(totalWithHst * 100);
   const origin   = req.headers.origin || `https://${req.headers.host}`;
   const BASE_URL = (origin.includes('localhost') || origin.includes('127.0.0.1'))
     ? origin
@@ -100,7 +105,9 @@ module.exports = async (req, res) => {
       location: location || '',
       vehicle:  vehicle  || '',
       notes:    (notes || '').slice(0, 400),
-      total:    String(total.toFixed(2)),
+      subtotal: String(subtotal.toFixed(2)),
+      hst:      String(hst.toFixed(2)),
+      total:    String(totalWithHst.toFixed(2)),
     },
   });
 

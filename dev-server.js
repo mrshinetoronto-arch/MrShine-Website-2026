@@ -58,6 +58,7 @@ function readBody(req) {
 const API_ROUTES = {
   '/api/create-checkout-session': './api/create-checkout-session',
   '/api/get-session':             './api/get-session',
+  '/api/bookings':                './api/bookings',
 };
 
 http.createServer(async (req, res) => {
