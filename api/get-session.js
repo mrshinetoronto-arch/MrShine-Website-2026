@@ -24,7 +24,10 @@ function formatDate(iso) {
 }
 
 async function sendEmails(m, amountTotal) {
-  if (!process.env.GMAIL_PASS) return;
+  if (!process.env.GMAIL_PASS) {
+    console.error('[EMAIL] GMAIL_PASS env var is not set — emails cannot be sent');
+    throw new Error('GMAIL_PASS not configured on server');
+  }
 
   const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -119,14 +122,21 @@ module.exports = async (req, res) => {
       return res.status(402).json({ error: 'Payment not completed' });
     }
 
-    // Send emails non-blocking — don't fail the response if email fails
-    sendEmails(session.metadata, session.amount_total).catch(err =>
-      console.error('Email error:', err.message)
-    );
+    // Await emails before responding — serverless functions can terminate after res.json()
+    let emailStatus = 'not_sent';
+    try {
+      await sendEmails(session.metadata, session.amount_total);
+      emailStatus = 'sent';
+      console.log('[EMAIL] Both confirmation emails sent successfully');
+    } catch (emailErr) {
+      console.error('[EMAIL FAILED]', emailErr.message);
+      emailStatus = `failed: ${emailErr.message}`;
+    }
 
     res.status(200).json({
       metadata:    session.metadata,
       amountTotal: session.amount_total,
+      emailStatus,
     });
   } catch (err) {
     console.error('get-session error:', err.message);

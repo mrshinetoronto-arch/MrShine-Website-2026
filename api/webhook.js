@@ -32,7 +32,10 @@ async function getRawBody(req) {
 }
 
 async function sendEmails(m, amountTotal) {
-  if (!process.env.GMAIL_PASS) return;
+  if (!process.env.GMAIL_PASS) {
+    console.error('[EMAIL] GMAIL_PASS env var is not set — emails cannot be sent');
+    throw new Error('GMAIL_PASS not configured on server');
+  }
 
   const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -129,9 +132,12 @@ module.exports = async (req, res) => {
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
     if (session.payment_status === 'paid') {
-      await sendEmails(session.metadata, session.amount_total).catch(err =>
-        console.error('Email error:', err.message)
-      );
+      try {
+        await sendEmails(session.metadata, session.amount_total);
+        console.log('[EMAIL] Webhook: both confirmation emails sent successfully');
+      } catch (err) {
+        console.error('[EMAIL FAILED] Webhook:', err.message);
+      }
     }
   }
 
